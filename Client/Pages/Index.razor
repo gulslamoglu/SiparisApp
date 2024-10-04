@@ -1,0 +1,22 @@
+﻿@page "/"
+
+
+<PageTitle>Product List</PageTitle>
+
+
+
+
+
+<button class="btn btn-primary" @onclick="OpenModal">Show Products</button>
+
+
+<ModalComponent @ref="productModal" />
+
+@code {
+    private ModalComponent productModal;
+
+    private void OpenModal()
+    {
+        productModal .Show();
+    }
+}

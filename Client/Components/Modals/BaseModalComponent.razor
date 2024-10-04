@@ -1,0 +1,51 @@
+﻿@code {
+    [Parameter]
+    public bool IsVisible { get; set; } = false;
+
+    [Parameter]
+    public string SelectedProductGroup { get; set; } = string.Empty;
+    [Parameter]
+    public string SearchTerm { get; set; } = string.Empty;
+
+    [Parameter]
+    public List<Product> FilteredProducts { get; set; } = new List<Product>();
+
+    
+    public List<string> ProductGroups = new List<string> { "ARAC TAKIP", "SU ARITMA", "DİĞER" };
+
+    
+    public List<Product> Products = new List<Product>
+    {
+        new Product { Group = "SU ARITMA", Name = "3502345-AURA CEBILON OFFICE POMPASIZ ARITMALI SU SEBILI" },
+        new Product { Group = "SU ARITMA", Name = "1300334-AURA CEBILON PLATINUM" },
+        new Product { Group = "SU ARITMA", Name = "1300334M5-AURA CEBILON PLATINUM M5" },
+        new Product { Group = "SU ARITMA", Name = "1300534-AURA CEBILON SILVER POMPASIZ" },
+        new Product { Group = "SU ARITMA", Name = "1300035M-AURA CEBILON UNIQUE POMPALI RO" }
+    };
+
+    
+    public void Show()
+    {
+        IsVisible = true;
+        FilterProducts(); 
+        StateHasChanged(); 
+    }
+
+    
+    public void Hide()
+    {
+        IsVisible = false;
+        StateHasChanged(); 
+    }
+
+ 
+    public void FilterProducts()
+    {
+        FilteredProducts = Products
+            .Where(p => (string.IsNullOrEmpty(SelectedProductGroup) || p.Group == SelectedProductGroup)
+                        && p.Name.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase))
+            .ToList();
+    }
+
+
+}
