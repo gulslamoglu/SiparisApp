@@ -3,20 +3,14 @@
 
 <PageTitle>Product List</PageTitle>
 
-
-
-
-
 <button class="btn btn-primary" @onclick="OpenModal">Show Products</button>
 
-
-<ModalComponent @ref="productModal" />
-
 @code {
-    private ModalComponent productModal;
+    [CascadingParameter] public IModalService Modal { get; set; } = default!;
 
-    private void OpenModal()
+    private async Task OpenModal()
     {
-        productModal .Show();
+        var modal = Modal.Show<ProductSearchModal>(new ModalOptions { HideHeader = true});
+        var result = await modal.Result;
     }
 }

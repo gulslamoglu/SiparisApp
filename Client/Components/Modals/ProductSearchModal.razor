@@ -1,0 +1,100 @@
+﻿
+<div class="row  mb-1 small">
+    <div class="col-4">
+        <label class="form-label form-label-sm">Ürün Grubu</label>
+    </div>
+    <div class="col-8">
+        <InputSelect TValue="string" @bind-Value="ProductGroup" class="form-control form-select form-select-sm">
+            <option value="">(Tüm Ürün Grupları)</option>
+            @foreach (var group in ProductGroups)
+            {
+                <option value="@group">@group</option>
+            }
+        </InputSelect>
+    </div>
+</div>
+
+<!-- Search for Ürün Adı -->
+<div class="row  mb-1 small">
+    <div class="col-4">
+        <label class=" form-label form-label-sm">Ürün Adı</label>
+    </div>
+    <div class="col-8">
+        <div class="input-group input-group-sm">
+            <InputText @bind-Value="FilterProducts" autocomplete="off" placeholder="Ürün adından ara" class="form-control border-end-0" />
+            <button type="submit" class="btn btn-outline-secondary" onclick="clicked" style=" border: 1px solid #ced4da; border-left: none"><i class="oi oi-magnifying-glass"></i></button>
+        </div>
+    </div>
+</div>
+
+<!-- Ürün tablosu -->
+<div class="p-2 border border-1" style="height: 200px; max-width: 100%; overflow: auto">
+    <table class="table table-sm table-hover small table-borderless ">
+        <tbody>
+            @foreach (var product in Products)
+            {
+                <tr style="cursor: pointer">
+                    <td><i class="oi oi-box"></i></td>
+                    <td><span style=" font-weight: 300; font-style:italic"> @product.Group</span></td>
+                    <td>@product.Name</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<!-- ürün sayısı -->
+<div class="p-2" style=" height: 40px;">
+    <div class="btg-dd-spinner spinner-grow spinner-border-sm text-dark align-middle" style="width: 22px; height: 22px; display: none;" role="status">
+        <span class="visually-hidden">Aranıyor</span>
+    </div>
+    <span class="btg-dd-status-text text-muted small fst-italic">@Products.Count() adet ürün listeleniyor.</span>
+</div>
+<style>
+    .blazored-modal{
+        padding: .5rem!important;
+    }
+</style>
+@code {
+    string[] ProductGroups = [
+    "ARAC TAKİP",
+    "BEYAZ ESYA",
+    "BILGISAYAR",
+    "DIGER",
+    "DİĞER-2",
+    "EV GERECLERI",
+    "EV TEKSTILI",
+    "GAZETE",
+    "ISITMA&amp;SOGUTMA",
+    "KISISEL BAKIM",
+    "KUCUK EV ALETLERI",
+    "MUTFAK GERECLERI",
+    "OTOMATIK EKLENEN",
+    "PHILIPS SU ARITMA",
+    "SAAT",
+    "SCOOTER",
+    "SOFRA",
+    "SPOR ALETLERI",
+    "SU ARITMA",
+    "SUPURGE",
+    "ŞOFBEN",
+    "TELEFON",
+    "TEMİZLİK ROBOTU",
+    "TV",
+];
+
+    string ProductGroup;
+    string FilterProducts;
+    public List<Product> Products = new List<Product>
+    {
+        new Product { Group = "SU ARITMA", Name = "3502345-AURA CEBILON OFFICE POMPASIZ ARITMALI SU SEBILI" },
+        new Product { Group = "SU ARITMA", Name = "1300334-AURA CEBILON PLATINUM" },
+        new Product { Group = "SU ARITMA", Name = "1300334M5-AURA CEBILON PLATINUM M5" },
+        new Product { Group = "SU ARITMA", Name = "1300534-AURA CEBILON SILVER POMPASIZ" },
+        new Product { Group = "SU ARITMA", Name = "1300035M-AURA CEBILON UNIQUE POMPALI RO" },
+        new Product { Group = "SU ARITMA", Name = "3502345-AURA CEBILON OFFICE POMPASIZ ARITMALI SU SEBILI" },
+        new Product { Group = "SU ARITMA", Name = "1300334-AURA CEBILON PLATINUM" },
+        new Product { Group = "SU ARITMA", Name = "1300334M5-AURA CEBILON PLATINUM M5" },
+        new Product { Group = "SU ARITMA", Name = "1300534-AURA CEBILON SILVER POMPASIZ" },
+        new Product { Group = "SU ARITMA", Name = "1300035M-AURA CEBILON UNIQUE POMPALI RO" }
+    };
+}
