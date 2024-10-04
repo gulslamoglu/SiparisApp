@@ -1,6 +1,7 @@
 ﻿@page "/"
 
 
+
 <PageTitle>Product List</PageTitle>
 
 
@@ -10,13 +11,13 @@
 <button class="btn btn-primary" @onclick="OpenModal">Show Products</button>
 
 
-<ModalComponent @ref="productModal" />
-
 @code {
-    private ModalComponent productModal;
+    [CascadingParameter] IModalService Modal { get; set; }
 
-    private void OpenModal()
+    async Task OpenModal()
     {
-        productModal .Show();
+        var modalRef = Modal.Show<ModalComponent>(new ModalOptions { HideHeader = true });
+
+        var modalResult = modalRef.Result;
     }
 }
