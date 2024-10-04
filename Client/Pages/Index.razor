@@ -12,7 +12,7 @@
 
 
 @code {
-    [CascadingParameter] IModalService Modal { get; set; }
+    [CascadingParameter] IModalService Modal { get; set; } = default;
 
     async Task OpenModal()
     {
