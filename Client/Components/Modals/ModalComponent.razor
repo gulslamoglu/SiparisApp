@@ -24,8 +24,8 @@
     </div>
     <div class="col-8">
         <div class="input-group input-group-sm">
-        <InputText @bind-Value="FilterProducts" autocomplete="off" placeholder="Ürün adından ara" class="form-control border-end-0"></InputText>
-        <button type="submit" class="btn btn-outline-secondary" onclick="FilterProductsList" style=" border: 1px solid #ced4da; border-left: none"><i class="oi oi-magnifying-glass"></i></button>
+         <input @bind-value="FilterProducts" @bind-value:event="oninput" autocomplete="off" placeholder="Ürün adından ara" class="form-control border-end-0" />
+        <button type="button" class="btn btn-outline-secondary" @onclick="FilterProductsList" style=" border: 1px solid #ced4da; border-left: none"><i class="oi oi-magnifying-glass"></i></button>
         </div>
     </div>
 </div>
@@ -64,6 +64,15 @@
 
 
 @code {
+    protected override void OnInitialized() => Fill();
+
+    public void Fill()
+    {
+        FilteredProducts = Products
+        .Where(p => (string.IsNullOrEmpty(SelectedProductGroup) || p.Group == SelectedProductGroup) &&
+                    (string.IsNullOrEmpty(FilterProducts) || p.Name.Contains(FilterProducts, StringComparison.OrdinalIgnoreCase)))
+        .ToList();
+    }
     string[] ProductGroups =
     {
         "ARAC TAKIP",
@@ -83,13 +92,7 @@
         new Product { Group = "SU ARITMA", Name = "1300035M-AURA CEBILON UNIQUE POMPALI RO" }
     };
 
-    private List<Product> FilteredProducts => Products
-        .Where(p => (string.IsNullOrEmpty(SelectedProductGroup) || p.Group == SelectedProductGroup) &&
-                    (string.IsNullOrEmpty(FilterProducts) || p.Name.Contains(FilterProducts, StringComparison.OrdinalIgnoreCase)))
-        .ToList();
+    private List<Product> FilteredProducts { get; set; } = [];
 
-    private void FilterProductsList()
-    {
-        StateHasChanged();
-    }
+    private void FilterProductsList() => Fill();
 }
