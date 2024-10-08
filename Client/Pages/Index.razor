@@ -8,15 +8,24 @@
 
 
 
-<button class="btn btn-primary" @onclick="OpenModal">Show Products</button>
+<button class="btn btn-primary" @onclick="OpenModal">Ürünleri Göster</button>
 
+
+<button class="btn btn-primary" @onclick="OpenIndirimMasrafModal">İndirim/Masraf Girişlerini göster</button>
 
 @code {
     [CascadingParameter] IModalService Modal { get; set; } = default;
 
     async Task OpenModal()
     {
-        var modalRef = Modal.Show<ModalComponent>(new ModalOptions { HideHeader = true });
+        var modalRef = Modal.Show<ModalComponent>(new ModalOptions { HideHeader = true , Size= ModalSize.Large});
+
+        var modalResult = modalRef.Result;
+    }
+
+    async Task OpenIndirimMasrafModal()
+    {
+        var modalRef = Modal.Show<IndirimMasrafModalComponent>(new ModalOptions{HideHeader= true});
 
         var modalResult = modalRef.Result;
     }

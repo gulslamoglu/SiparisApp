@@ -1,0 +1,184 @@
+﻿
+@* Title *@
+<div class="small btg-table-caption">AURA CEBILON PLATINUM M5 İndirim/Masraf girişleri</div>
+
+@* TutarTextbox *@
+<div class="row">
+    <div class="col-6" style="margin-top: auto">
+        <button class="btn btn-sm btn-outline-primary" @onclick="AddNewIskontoMasraf"> <i class="bi bi-plus"></i> İskonto/Masraf Ekle</button>
+    </div>
+    <div class="col-6">
+        <div class="row">
+            <div class="col-12 col-lg-5" style="font-size:small">Satır Tutarı</div>
+            <div class="col-12 col-lg-7">
+                <input type="text" class="form-control form-control-sm text-end" value="@SatisTutari.ToString("N2")" @oninput="UpdateSonucTutari">
+            </div>
+        </div>
+        <div class="row mt-1">
+            <div class="col-12 col-lg-5" style="font-size:small">İskonto+Masraf</div>
+            <div class="col-12 col-lg-7">
+                <input type="text" class="form-control form-control-sm text-end" value="@ToplamIskontoMasraf.ToString("N2")" readonly>
+            </div>
+        </div>
+        <div class="row mt-1">
+            <div class="col-12 col-lg-5" style="font-size:small">Sonuç Tutarı</div>
+            <div class="col-12 col-lg-7">
+                <input type="text" class="form-control form-control-sm text-end" value="@SonucTutari.ToString("N2")" readonly>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* tablo *@
+<div class=" border border-1 overflow-auto" style="height: 150px; max-width: 100%;">
+    <table id="tblUrunFiyatList" class="table table-sm table-hover small border-1 w-100 ">
+        <thead class="text-center">
+            <tr>
+                <th>#</th>
+                <th>Türü (Lehdar)</th>
+                <th>Hesaplama</th>
+                <th>Miktar</th>
+                <th>Hesaplanan</th>
+                <th>Açıklama</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in IskontoMasrafList)
+            {
+                <tr>
+                    <td nowrap align="center">
+                        <button class="btn btn-sm btn-outline-danger border-0" @onclick="() => RemoveRow(item)"><i class="bi bi-x-lg"></i></button>
+                    </td>
+                    <td nowrap align="center">
+                        <select class="form-control form-control-sm text-white @(item.Turu == "Masraf" ? "bg-danger" : "bg-success") border-0" style="max-width: 86px" @bind="item.Turu">
+                            <option value="İskonto" style="background-color: #28a745; color: white;" selected="@((item.Turu == "İskonto") ? "selected" : null)">İskonto</option>
+                            <option value="Masraf" style="background-color: #dc3545; color: white;" selected="@((item.Turu == "Masraf") ? "selected" : null)">Masraf</option>
+                        </select>
+                    </td>
+                    <td nowrap align="center">
+                        <select class="form-control form-control-sm border-0" style="min-width: 42px; max-width: 98px" @onchange="(e) => SetHesaplamaTuru(item, e.Value)">
+                            <option value="Oran" selected="@((item.Hesaplama == "Oran") ? "selected" : null)">Oran (%)</option>
+                            <option value="Tutar" selected="@((item.Hesaplama == "Tutar") ? "selected" : null)">Tutar (TL)</option>
+                        </select>
+                    </td>
+                    <td nowrap align="center">
+                        <div class="input-group">
+                            <input class="form-control form-control-sm text-end border-0"
+                                   type="number"
+                                   value="@item.Miktar"
+                                   min="0"
+                                   max="100"
+                                   @oninput="(e) => UpdateMiktar(item, e.Value)" />
+                            <span class="input-group-text border-1">
+                                @((item.Hesaplama == "Oran") ? " % " : "TL")
+                            </span>
+                        </div>
+                    </td>
+                    <td nowrap align="center">
+                        <input class="form-control form-control-sm text-end border-0" type="text" value="@item.Hesaplanan.ToString("N2")" readonly style="min-width: 80px; max-width: 160px;">
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@* footer *@
+<div class="p-2 ">
+    <div class="row">
+        <div class="col-4 col-lg-2"><label>İskonto</label></div>
+        <div class="col-6 col-lg-4 "><input type="text" value="@ToplamIskonto.ToString("N2")" class="form-control form-control-sm text-end" readonly=""></div>
+        <div class="col-4 mt-1 col-lg-2 mt-lg-0"><label>Masraf</label></div>
+        <div class="col-6 mt-1 col-lg-4 mt-lg-0"><input type="text" value="@ToplamMasraf.ToString("N2")" class="form-control form-control-sm text-end" readonly=""></div>
+    </div>
+
+    <div class="m-2 text-end">
+        <button type="button"  class="btn btn-sm btn-secondary" ><i class="bi bi-x"></i> İptal</button>
+        <button type="button"  class="btn btn-sm btn-primary"><i class="bi bi-check-lg"></i> Tamam</button>
+    </div>
+</div>
+
+<style>
+    .blazored-modal {
+        padding: 0.5rem !important;
+    }
+</style>
+
+@code {
+    private string selectedType = "İskonto"; // Varsayılan değer iskonto olsun-opsiyonel
+    private decimal SatisTutari = 14000.00M;
+    private List<IskontoMasraf> IskontoMasrafList = new List<IskontoMasraf>
+    {
+         new IskontoMasraf { Turu = "İskonto", Hesaplama = "Oran", Miktar = 5.00M, Hesaplanan = -700.00M },
+        new IskontoMasraf { Turu = "Masraf", Hesaplama = "Tutar", Miktar = 400.00M, Hesaplanan = 400.00M }
+    }; // Başlangıçta listeye birkaç nesne ekleyelim
+
+    private decimal ToplamIskontoMasraf => IskontoMasrafList.Sum(x => x.Hesaplanan);
+    private decimal SonucTutari => SatisTutari + ToplamIskontoMasraf;
+    private decimal ToplamIskonto => IskontoMasrafList.Where(x => x.Turu == "İskonto").Sum(x => x.Hesaplanan);
+    private decimal ToplamMasraf => IskontoMasrafList.Where(x => x.Turu == "Masraf").Sum(x => x.Hesaplanan);
+
+    private void UpdateSonucTutari(ChangeEventArgs e)
+    {
+        if (decimal.TryParse(e.Value.ToString(), out decimal newSatisTutari))
+        {
+            SatisTutari = newSatisTutari;
+            UpdateToplam();
+        }
+    }
+
+    private void SetHesaplamaTuru(IskontoMasraf item, object selectedValue)
+    {
+        item.Hesaplama = selectedValue.ToString();
+        UpdateToplam();
+    }
+
+    private void UpdateMiktar(IskontoMasraf item, object value)
+    {
+        if (decimal.TryParse(value.ToString(), out decimal newMiktar))
+        {
+            if (newMiktar > 100) // Miktar 100'ü geçemein diye
+            {
+                newMiktar = 100;
+            }
+            item.Miktar = newMiktar;
+            UpdateToplam();
+        }
+    }
+
+    private void UpdateToplam()
+    {
+        foreach (var item in IskontoMasrafList)
+        {
+            if (item.Hesaplama == "Oran")
+            {
+                // İskonto olduğunda negatif
+                if (item.Turu == "İskonto")
+                {
+                    item.Hesaplanan = -(SatisTutari * item.Miktar / 100);
+                }
+                else if (item.Turu == "Masraf")
+                {
+                    item.Hesaplanan = SatisTutari * item.Miktar / 100;
+                }
+            }
+            else if (item.Hesaplama == "Tutar")
+            {
+                // Tutar hesaplaması
+                item.Hesaplanan = (item.Turu == "İskonto") ? -item.Miktar : item.Miktar;
+            }
+        }
+    }
+
+    private void RemoveRow(IskontoMasraf item)
+    {
+        IskontoMasrafList.Remove(item);
+        UpdateToplam();
+    }
+
+    private void AddNewIskontoMasraf()
+    {
+        IskontoMasrafList.Add(new IskontoMasraf { Turu = selectedType, Miktar = 0, Hesaplama = "Oran" });
+        UpdateToplam();
+    }
+}
