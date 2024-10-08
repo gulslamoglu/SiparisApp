@@ -25,7 +25,7 @@
 
     async Task OpenIndirimMasrafModal()
     {
-        var modalRef = Modal.Show<IndirimMasrafModalComponent>(new ModalOptions{HideHeader= true});
+        var modalRef = Modal.Show<IndirimMasrafModalComponent>(new ModalOptions { HideHeader = true, Size = ModalSize.Large });
 
         var modalResult = modalRef.Result;
     }
