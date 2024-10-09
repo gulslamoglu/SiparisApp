@@ -13,12 +13,15 @@
 
 <button class="btn btn-primary" @onclick="OpenIndirimMasrafModal">İndirim/Masraf Girişlerini göster</button>
 
+
+<button class="btn btn-primary" @onclick="AdresGoster">Adresleri Göster</button>
+
 @code {
     [CascadingParameter] IModalService Modal { get; set; } = default;
 
     async Task OpenModal()
     {
-        var modalRef = Modal.Show<ModalComponent>(new ModalOptions { HideHeader = true , Size= ModalSize.Large});
+        var modalRef = Modal.Show<ModalComponent>(new ModalOptions { HideHeader = true });
 
         var modalResult = modalRef.Result;
     }
@@ -26,6 +29,13 @@
     async Task OpenIndirimMasrafModal()
     {
         var modalRef = Modal.Show<IndirimMasrafModalComponent>(new ModalOptions { HideHeader = true, Size = ModalSize.Large });
+
+        var modalResult = modalRef.Result;
+    }
+
+    async Task AdresGoster()
+    {
+        var modalRef = Modal.Show<AdresPopUpComponent>(new ModalOptions { HideHeader = true });
 
         var modalResult = modalRef.Result;
     }

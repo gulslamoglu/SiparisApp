@@ -1,0 +1,245 @@
+﻿<EditForm Model="newAddress" OnValidSubmit="HandleValidSubmit" class="needs-validation" novalidate>
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label for="country" class="form-label">Ülke:</label>
+        <select id="country" class="form-select" @bind="selectedCountry" @bind:event="onchange">
+            <option value="">Lütfen seçiniz</option>
+            @foreach (var country in Ulkeler)
+            {
+                <option value="@country">@country</option>
+            }
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label for="city" class="form-label">İl:</label>
+        <select id="city" class="form-select" @bind="selectedCity" @bind:event="onchange">
+            <option value="">Lütfen seçiniz</option>
+            @foreach (var city in Iller)
+            {
+                <option value="@city.IlName">@city.IlName</option>
+            }
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label for="district" class="form-label">İlçe:</label>
+        <select id="district" class="form-select" @bind="selectedDistrict" @bind:event="onchange">
+            <option value="">Lütfen seçiniz</option>
+            @if (!string.IsNullOrEmpty(selectedCity))
+            {
+                var selectedIl = Iller.FirstOrDefault(x => x.IlName == selectedCity);
+                if (selectedIl != null)
+                {
+                    foreach (var district in selectedIl.Ilceler)
+                    {
+                        <option value="@district.IlceName">@district.IlceName</option>
+                    }
+                }
+            }
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label for="neighborhood" class="form-label">Mahalle:</label>
+        <select id="neighborhood" class="form-select" @bind="selectedNeighborhood" @bind:event="onchange">
+            <option value="">Lütfen seçiniz</option>
+            @if (!string.IsNullOrEmpty(selectedDistrict))
+            {
+                var selectedIl = Iller.FirstOrDefault(x => x.Ilceler.Any(d => d.IlceName == selectedDistrict));
+                if (selectedIl != null)
+                {
+                    var selectedIlce = selectedIl.Ilceler.FirstOrDefault(d => d.IlceName == selectedDistrict);
+                    if (selectedIlce != null)
+                    {
+                        foreach (var neighborhood in selectedIlce.Mahalleler)
+                        {
+                            <option value="@neighborhood.MahalleName">@neighborhood.MahalleName</option>
+                        }
+                    }
+                }
+            }
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label for="street" class="form-label">Sokak:</label>
+        <select id="street" class="form-select" @bind="newAddress.Street">
+            <option value="">Lütfen seçiniz</option>
+            @if (!string.IsNullOrEmpty(selectedNeighborhood))
+            {
+                var selectedIl = Iller.FirstOrDefault(x => x.Ilceler.Any(d => d.IlceName == selectedDistrict));
+                if (selectedIl != null)
+                {
+                    var selectedIlce = selectedIl.Ilceler.FirstOrDefault(d => d.IlceName == selectedDistrict);
+                    if (selectedIlce != null)
+                    {
+                        var selectedMahalle = selectedIlce.Mahalleler.FirstOrDefault(m => m.MahalleName == selectedNeighborhood);
+                        if (selectedMahalle != null)
+                        {
+                            foreach (var street in selectedMahalle.Sokaklar)
+                            {
+                                <option value="@street">@street</option>
+                            }
+                        }
+                    }
+                }
+            }
+        </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Kaydet</button>
+</EditForm>
+
+@if (addresses.Count > 0)
+{
+    <h4>Kayıtlı Adresler:</h4>
+    <ul class="list-group">
+        @foreach (var address in addresses)
+        {
+            <li class="list-group-item">@($"{address.Country}, {address.City}, {address.District}, {address.Neighborhood}, {address.Street}")</li>
+        }
+    </ul>
+}
+
+@code {
+    private Address newAddress = new Address();
+    private List<Address> addresses = new List<Address>();
+    private string selectedCountry;
+    private string selectedCity;
+    private string selectedDistrict;
+    private string selectedNeighborhood;
+    private List<string> streets;
+
+    string[] Ulkeler =
+    {
+        "TÜRKİYE"
+    };
+
+    private List<Il> Iller = new List<Il>
+    {
+        new Il
+        {
+            IlName = "İstanbul",
+            Ilceler = new List<Ilce>
+            {
+                new Ilce
+                {
+                    IlceName = "Kadıköy",
+                    Mahalleler = new List<Mahalle>
+                    {
+                        new Mahalle
+                        {
+                            MahalleName = "Fenerbahçe",
+                            Sokaklar = new List<string> { "Bağdat Caddesi", "Fenerbahçe Sokak" }
+                        },
+                        new Mahalle
+                        {
+                            MahalleName = "Moda",
+                            Sokaklar = new List<string> { "Moda Caddesi", "Şair Nefi Sokak" }
+                        }
+                    }
+                },
+                new Ilce
+                {
+                    IlceName = "Beşiktaş",
+                    Mahalleler = new List<Mahalle>
+                    {
+                        new Mahalle
+                        {
+                            MahalleName = "Etiler",
+                            Sokaklar = new List<string> { "Nispetiye Caddesi", "Levent Caddesi" }
+                        },
+                        new Mahalle
+                        {
+                            MahalleName = "Levent",
+                            Sokaklar = new List<string> { "Büyükdere Caddesi", "Eski Büyükdere Yolu" }
+                        }
+                    }
+                }
+            }
+        },
+        new Il
+        {
+            IlName = "Ankara",
+            Ilceler = new List<Ilce>
+            {
+                new Ilce
+                {
+                    IlceName = "Çankaya",
+                    Mahalleler = new List<Mahalle>
+                    {
+                        new Mahalle
+                        {
+                            MahalleName = "Ayrancı",
+                            Sokaklar = new List<string> { "Atatürk Bulvarı", "Hoşdere Caddesi" }
+                        },
+                        new Mahalle
+                        {
+                            MahalleName = "Bahçelievler",
+                            Sokaklar = new List<string> { "7. Cadde", "Milli Kütüphane Sokak" }
+                        }
+                    }
+                }
+            }
+        },
+        new Il
+        {
+            IlName = "Kocaeli",
+            Ilceler = new List<Ilce>
+            {
+                new Ilce
+                {
+                    IlceName = "İzmit",
+                    Mahalleler = new List<Mahalle>
+                    {
+                        new Mahalle
+                        {
+                            MahalleName = "Yahya Kaptan",
+                            Sokaklar = new List<string> { "Kaptan Caddesi", "Doğu Sokak" }
+                        },
+                        new Mahalle
+                        {
+                            MahalleName = "Cumhuriyet",
+                            Sokaklar = new List<string> { "İnönü Caddesi", "Park Sokak" }
+                        }
+                    }
+                },
+                new Ilce
+                {
+                    IlceName = "Gebze",
+                    Mahalleler = new List<Mahalle>
+                    {
+                        new Mahalle
+                        {
+                            MahalleName = "Beylikbağı",
+                            Sokaklar = new List<string> { "Fatih Caddesi", "Sanayi Sokak" }
+                        },
+                        new Mahalle
+                        {
+                            MahalleName = "Mustafapaşa",
+                            Sokaklar = new List<string> { "Atatürk Caddesi", "Çarşı Sokak" }
+                        }
+                    }
+                }
+            }
+        }
+    };
+
+    private void HandleValidSubmit()
+    {
+        newAddress.Country = selectedCountry;
+        newAddress.City = selectedCity;
+        newAddress.District = selectedDistrict;
+        newAddress.Neighborhood = selectedNeighborhood;
+
+        addresses.Add(newAddress);
+        newAddress = new Address(); // Formu sıfırlamak için
+        selectedCity = selectedDistrict = selectedNeighborhood = null;
+        streets = null; // Sokakları sıfırla
+    }
+}
+
+

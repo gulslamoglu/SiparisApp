@@ -9,19 +9,19 @@
     </div>
     <div class="col-6">
         <div class="row">
-            <div class="col-12 col-lg-5" style="font-size:small">Satır Tutarı</div>
+            <div class="col-12 col-lg-5" >Satır Tutarı</div>
             <div class="col-12 col-lg-7">
                 <input type="text" class="form-control form-control-sm text-end" value="@SatisTutari.ToString("N2")" @oninput="UpdateSonucTutari">
             </div>
         </div>
         <div class="row mt-1">
-            <div class="col-12 col-lg-5" style="font-size:small">İskonto+Masraf</div>
+            <div class="col-12 col-lg-5">İskonto+Masraf</div>
             <div class="col-12 col-lg-7">
                 <input type="text" class="form-control form-control-sm text-end" value="@ToplamIskontoMasraf.ToString("N2")" readonly>
             </div>
         </div>
         <div class="row mt-1">
-            <div class="col-12 col-lg-5" style="font-size:small">Sonuç Tutarı</div>
+            <div class="col-12 col-lg-5">Sonuç Tutarı</div>
             <div class="col-12 col-lg-7">
                 <input type="text" class="form-control form-control-sm text-end" value="@SonucTutari.ToString("N2")" readonly>
             </div>
@@ -56,7 +56,7 @@
                         </select>
                     </td>
                     <td nowrap align="center">
-                        <select class="form-control form-control-sm border-0" style="min-width: 42px; max-width: 98px" @onchange="(e) => SetHesaplamaTuru(item, e.Value)">
+                        <select class="form-control form-control-sm border-0" style="min-width: 42px !important;max-width: 98px" @onchange="(e) => SetHesaplamaTuru(item, e.Value)">
                             <option value="Oran" selected="@((item.Hesaplama == "Oran") ? "selected" : null)">Oran (%)</option>
                             <option value="Tutar" selected="@((item.Hesaplama == "Tutar") ? "selected" : null)">Tutar (TL)</option>
                         </select>
@@ -66,10 +66,12 @@
                             <input class="form-control form-control-sm text-end border-0"
                                    type="number"
                                    value="@item.Miktar"
-                                   min="0"
+                                   step="0.50"
+                                   min="1"
                                    max="100"
+                                   style="min-width: 80px !important; max-width: 160px;"
                                    @oninput="(e) => UpdateMiktar(item, e.Value)" />
-                            <span class="input-group-text border-1">
+                            <span class="input-group-text border-1" >
                                 @((item.Hesaplama == "Oran") ? " % " : "TL")
                             </span>
                         </div>
@@ -100,7 +102,7 @@
 
 <style>
     .blazored-modal {
-        padding: 0.5rem !important;
+        padding: 0.2rem !important;
     }
 </style>
 
@@ -109,7 +111,7 @@
     private decimal SatisTutari = 14000.00M;
     private List<IskontoMasraf> IskontoMasrafList = new List<IskontoMasraf>
     {
-         new IskontoMasraf { Turu = "İskonto", Hesaplama = "Oran", Miktar = 5.00M, Hesaplanan = -700.00M },
+        new IskontoMasraf { Turu = "İskonto", Hesaplama = "Oran", Miktar = 5.00M, Hesaplanan = -700.00M },
         new IskontoMasraf { Turu = "Masraf", Hesaplama = "Tutar", Miktar = 400.00M, Hesaplanan = 400.00M }
     }; // Başlangıçta listeye birkaç nesne ekleyelim
 
