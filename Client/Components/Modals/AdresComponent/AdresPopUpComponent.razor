@@ -1,0 +1,114 @@
+﻿@* Baslik *@
+<div class="small btg-table-caption my-1">AURA CEBILON PLATINUM M5 Teslim Adresi</div>
+
+
+@* Yeni Adres Ekle *@
+<div class="my-1 text-end">
+    <button class="btn btn-sm btn-outline-primary small" @onclick="AddNewAdress"> <i class="bi bi-plus-lg"></i> Yeni Adres Ekle</button>
+</div>@* Yeni Adres Ekle *@
+
+
+
+@* Adres Tablosu *@
+<div class="p-2 border border-1" style="height: 200px; max-width: 100%; overflow: auto">
+    <table  class="table table-sm table-hover small table-borderless ">
+        <tbody>
+            @foreach(var item in GetAdres)
+            {
+                <tr style="cursor: pointer" @onclick="@(() => EditAddress(item))">
+                    <td>
+                        <div class="fw-bold">
+                            @if (item.AdresBasligi == "Ev Adresi")
+                            {
+                                <i class="bi bi-house-door"></i>
+                            }
+                            else if (item.AdresBasligi == "İş Adresi")
+                            {
+                                <i class="bi bi-briefcase"></i>
+                            }
+                            else if (item.AdresBasligi == "Diğer")
+                            {
+                                <i class="bi bi-info-circle"></i>
+                            }
+                            @item.AdresBasligi
+                        </div>
+                        <div class="ps-2 text-muted">
+                            @item.AcikAdres
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>@* Adres Tablosu *@
+
+
+@* Adres Adeti *@
+<div class="p-2 " style=" height: 40px;">
+    <span class="btg-dd-status-text text-muted small fst-italic">@GetAdres.Count() adet Adres listeleniyor.</span>
+    <a class="btn-link btg-btn-cancel  float-end" href="javascript:;"><i class="bi bi-x"></i></a>
+</div>@* Adres Adeti *@
+
+
+<style>
+    .blazored-modal{
+        padding: 0.5rem!important;
+    }
+
+</style>
+
+@code {
+    private List<Address> GetAdres = new List<Address>
+    {
+        new Address {AdresBasligi = "Ev Adresi", AcikAdres= "SAHİL MAH Kaptanı Derya Sk. No: 9 K.1 D: 2034524 BEYLİKDÜZÜ / İSTANBUL"},
+        new Address {AdresBasligi = "İş Adresi", AcikAdres= "YENİBOSNA MERKEZ MAH 29 Ekim Caddesi İhlas Plaza No:11 B/1134197 BAHÇELİEVLER / İSTANBUL"},
+        new Address {AdresBasligi = "İş Adresi", AcikAdres = "EMİNAÇMA KÖYÜ No: 80 (Caminin Arkası)81100 MERKEZ / DÜZCE"},
+
+    };
+
+    [CascadingParameter] IModalService modalService { get; set; } = default;
+
+
+    async Task AddNewAdress()
+    {
+        var modalRef = modalService.Show<YeniAdresEklePopUpComponent>(
+            new ModalOptions { HideHeader = true , Size = ModalSize.Small});
+
+        var result = await modalRef.Result;
+        if (!result.Cancelled)
+        {
+            var newAddress = result.Data as Address;
+            if (newAddress != null)
+            {
+                GetAdres.Add(newAddress);
+                StateHasChanged();
+                // AdresEkle(newAddress);
+            }
+        }
+    }
+
+    async Task EditAddress(Address address)
+    {
+        var modalRef = modalService.Show<YeniAdresEklePopUpComponent>(
+            new ModalParameters().Add("AddressToEdit", address), 
+            new ModalOptions { HideHeader = true, Size = ModalSize.Small } 
+        );
+
+        var result = await modalRef.Result;
+
+        if (!result.Cancelled)
+        {
+            var updatedAddress = result.Data as Address;
+            if (updatedAddress != null)
+            {
+                var index = GetAdres.FindIndex(a => a.AdresBasligi == address.AdresBasligi && a.AcikAdres == address.AcikAdres);
+                if (index != -1)
+                {
+                    GetAdres[index] = updatedAddress; // Güncellenmiş adres bilgilerini mevcut listeye ekle:))))))))))))
+                }
+                StateHasChanged();
+            }
+        }
+    }
+
+}

@@ -3,8 +3,8 @@
     <ValidationSummary />
 
     <div class="mb-3">
-        <label for="country" class="form-label">Ülke:</label>
-        <select id="country" class="form-select" @bind="selectedCountry" @bind:event="onchange">
+        <label for="country" class="form-label col-form-label-sm">Ülke:</label>
+        <select id="country" class="form-select form-control-sm" @bind="selectedCountry" @bind:event="onchange">
             <option value="">Lütfen seçiniz</option>
             @foreach (var country in Ulkeler)
             {
@@ -14,8 +14,8 @@
     </div>
 
     <div class="mb-3">
-        <label for="city" class="form-label">İl:</label>
-        <select id="city" class="form-select" @bind="selectedCity" @bind:event="onchange">
+        <label for="city" class="form-label col-form-label-sm">İl:</label>
+        <select id="city" class="form-select form-control-sm" @bind="selectedCity" @bind:event="onchange">
             <option value="">Lütfen seçiniz</option>
             @foreach (var city in Iller)
             {
@@ -25,8 +25,8 @@
     </div>
 
     <div class="mb-3">
-        <label for="district" class="form-label">İlçe:</label>
-        <select id="district" class="form-select" @bind="selectedDistrict" @bind:event="onchange">
+        <label for="district" class="form-label col-form-label-sm">İlçe:</label>
+        <select id="district" class="form-select form-control-sm" @bind="selectedDistrict" @bind:event="onchange">
             <option value="">Lütfen seçiniz</option>
             @if (!string.IsNullOrEmpty(selectedCity))
             {
@@ -43,8 +43,8 @@
     </div>
 
     <div class="mb-3">
-        <label for="neighborhood" class="form-label">Mahalle:</label>
-        <select id="neighborhood" class="form-select" @bind="selectedNeighborhood" @bind:event="onchange">
+        <label for="neighborhood" class="form-label col-form-label-sm">Mahalle:</label>
+        <select id="neighborhood" class="form-select form-control-sm" @bind="selectedNeighborhood" @bind:event="onchange">
             <option value="">Lütfen seçiniz</option>
             @if (!string.IsNullOrEmpty(selectedDistrict))
             {
@@ -65,8 +65,8 @@
     </div>
 
     <div class="mb-3">
-        <label for="street" class="form-label">Sokak:</label>
-        <select id="street" class="form-select" @bind="newAddress.Street">
+        <label for="street" class="form-label col-form-label-sm">Sokak:</label>
+        <select id="street" class="form-select form-control-sm" @bind="newAddress.Street">
             <option value="">Lütfen seçiniz</option>
             @if (!string.IsNullOrEmpty(selectedNeighborhood))
             {
@@ -90,21 +90,45 @@
         </select>
     </div>
 
-    <button type="submit" class="btn btn-primary">Kaydet</button>
+    <!-- Adres Başlığı -->
+    <div class="mb-3">
+        <label class="form-label col-form-label-sm">Adres Başlığı:</label>
+        <div>
+            <div>
+                <input type="radio" id="home" name="adresBasligi" value="Ev Adresi" @onchange="OnAddressTitleChange" />
+                <label for="home">
+                    <i class="bi bi-house-door"></i> Ev
+                </label>
+            </div>
+            <div>
+                <input type="radio" id="work" name="adresBasligi" value="İş Adresi" @onchange="OnAddressTitleChange" />
+                <label for="work">
+                    <i class="bi bi-briefcase"></i> İş
+                </label>
+            </div>
+            <div>
+                <input type="radio" id="other" name="adresBasligi" value="Diğer" @onchange="OnAddressTitleChange" />
+                <label for="other">
+                    <i class="bi bi-info-circle"></i> Diğer
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <!-- Açık Adres -->
+    <div class="mb-3">
+        <label for="acikAdres" class="form-label col-form-label-sm">Açık Adres:</label>
+        <textarea id="acikAdres" class="form-control form-control-sm" @bind="newAddress.AcikAdres" placeholder="Açık Adres"></textarea>
+    </div>
+
+    <div class="m-2 text-end">
+        <button type="submit" class="btn btn-sm btn-primary"><i class="bi bi-check-lg"></i>Kaydet</button>
+    </div>
 </EditForm>
 
-@if (addresses.Count > 0)
-{
-    <h4>Kayıtlı Adresler:</h4>
-    <ul class="list-group">
-        @foreach (var address in addresses)
-        {
-            <li class="list-group-item">@($"{address.Country}, {address.City}, {address.District}, {address.Neighborhood}, {address.Street}")</li>
-        }
-    </ul>
-}
 
 @code {
+    [Parameter] public Address AddressToEdit { get; set; }
     private Address newAddress = new Address();
     private List<Address> addresses = new List<Address>();
     private string selectedCountry;
@@ -113,8 +137,10 @@
     private string selectedNeighborhood;
     private List<string> streets;
 
+
+
     string[] Ulkeler =
-    {
+       {
         "TÜRKİYE"
     };
 
@@ -228,7 +254,37 @@
         }
     };
 
-    private void HandleValidSubmit()
+
+    protected override void OnInitialized()
+    {
+        // Eğer düzenleme işlemi ise, mevcut adres bilgilerini yükle
+        if (AddressToEdit != null)
+        {
+            newAddress = new Address
+                {
+                    AdresBasligi = AddressToEdit.AdresBasligi,
+                    AcikAdres = AddressToEdit.AcikAdres,
+                    Country = AddressToEdit.Country,
+                    City = AddressToEdit.City,
+                    District = AddressToEdit.District,
+                    Neighborhood = AddressToEdit.Neighborhood,
+                    Street = AddressToEdit.Street // Eğer varsa
+                };
+
+            selectedCountry = AddressToEdit.Country;
+            selectedCity = AddressToEdit.City;
+            selectedDistrict = AddressToEdit.District;
+            selectedNeighborhood = AddressToEdit.Neighborhood;
+        }
+    }
+
+    private void OnAddressTitleChange(ChangeEventArgs e)
+    {
+        newAddress.AdresBasligi = e.Value.ToString(); 
+    }
+
+    [CascadingParameter] BlazoredModalInstance BlazoredModal { get; set; } = default!;
+    private async Task HandleValidSubmit()
     {
         newAddress.Country = selectedCountry;
         newAddress.City = selectedCity;
@@ -236,9 +292,7 @@
         newAddress.Neighborhood = selectedNeighborhood;
 
         addresses.Add(newAddress);
-        newAddress = new Address(); // Formu sıfırlamak için
-        selectedCity = selectedDistrict = selectedNeighborhood = null;
-        streets = null; // Sokakları sıfırla
+        await BlazoredModal.CloseAsync(ModalResult.Ok(newAddress));
     }
 }
 
