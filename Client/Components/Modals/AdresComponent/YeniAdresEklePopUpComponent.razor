@@ -2,132 +2,179 @@
     <DataAnnotationsValidator />
     <ValidationSummary />
 
-    <div class="mb-3">
-        <label for="country" class="form-label col-form-label-sm">Ülke:</label>
-        <select id="country" class="form-select form-control-sm" @bind="selectedCountry" @bind:event="onchange">
-            <option value="">Lütfen seçiniz</option>
-            @foreach (var country in Ulkeler)
-            {
-                <option value="@country">@country</option>
-            }
-        </select>
-    </div>
+    <div class="p-4 border border-1 mb-4" style="border-radius:10px">
+        <!-- Adres Başlığı -->
+        <div class="mb-2 row">
+            <label class="form-label  col-3">Türü</label>
+            <div class="col-9">
+                <div class="btn-group  w-100" role="group" aria-label="Basic radio toggle button group">
+                    <input type="radio" class="btn-check" name="adresBasligi" id="home" autocomplete="off" value="Ev Adresi" @onchange="OnAddressTitleChange" checked>
+                    <label class="btn btn-outline-@(selectedAddressTitle == "Ev Adresi" ? "primary" : "secondary")" for="home">
+                        <i class="bi bi-house-door-fill"></i> Ev
+                    </label>
 
-    <div class="mb-3">
-        <label for="city" class="form-label col-form-label-sm">İl:</label>
-        <select id="city" class="form-select form-control-sm" @bind="selectedCity" @bind:event="onchange">
-            <option value="">Lütfen seçiniz</option>
-            @foreach (var city in Iller)
-            {
-                <option value="@city.IlName">@city.IlName</option>
-            }
-        </select>
-    </div>
+                    <input type="radio" class="btn-check" name="adresBasligi" id="work" autocomplete="off" value="İş Adresi" @onchange="OnAddressTitleChange">
+                    <label class="btn btn-outline-@(selectedAddressTitle == "İş Adresi" ? "primary" : "secondary")" for="work">
+                        <i class="bi bi-briefcase-fill"></i> İş
+                    </label>
 
-    <div class="mb-3">
-        <label for="district" class="form-label col-form-label-sm">İlçe:</label>
-        <select id="district" class="form-select form-control-sm" @bind="selectedDistrict" @bind:event="onchange">
-            <option value="">Lütfen seçiniz</option>
-            @if (!string.IsNullOrEmpty(selectedCity))
-            {
-                var selectedIl = Iller.FirstOrDefault(x => x.IlName == selectedCity);
-                if (selectedIl != null)
-                {
-                    foreach (var district in selectedIl.Ilceler)
+                    <input type="radio" class="btn-check" name="adresBasligi" id="other" autocomplete="off" value="Diğer" @onchange="OnAddressTitleChange">
+                    <label class="btn btn-outline-@(selectedAddressTitle == "Diğer" ? "primary" : "secondary")" for="other">
+                        <i class="bi bi-info-circle-fill"></i> Diğer
+                    </label>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Tanımı -->
+        <div class="mb-2 row">
+            <label for="tanimi" class="form-label col-form-label-sm col-3">Tanımı</label>
+            <div class="col-9">
+                <input type="text" id="tanimi" class="form-control form-control-sm" @bind="newAddress.Tanimi" placeholder="Tanımı" required />
+            </div>
+        </div>
+
+        <!-- Ülke Seçimi -->
+        <div class="mb-2 row">
+            <label for="country" class="form-label col-form-label-sm col-3">Ülke</label>
+            <div class="col-9">
+                <select id="country" class="form-select form-select-sm" @bind="selectedCountry" @bind:event="onchange" required>
+                    @* <option value="">Ülke Seçiniz!</option> *@
+                    @foreach (var country in Ulkeler)
                     {
-                        <option value="@district.IlceName">@district.IlceName</option>
+                        <option value="@country">@country</option>
                     }
-                }
-            }
-        </select>
-    </div>
+                </select>
+            </div>
+        </div>
 
-    <div class="mb-3">
-        <label for="neighborhood" class="form-label col-form-label-sm">Mahalle:</label>
-        <select id="neighborhood" class="form-select form-control-sm" @bind="selectedNeighborhood" @bind:event="onchange">
-            <option value="">Lütfen seçiniz</option>
-            @if (!string.IsNullOrEmpty(selectedDistrict))
-            {
-                var selectedIl = Iller.FirstOrDefault(x => x.Ilceler.Any(d => d.IlceName == selectedDistrict));
-                if (selectedIl != null)
-                {
-                    var selectedIlce = selectedIl.Ilceler.FirstOrDefault(d => d.IlceName == selectedDistrict);
-                    if (selectedIlce != null)
+        <!-- İl Seçimi -->
+        <div class="mb-2 row">
+            <label for="city" class="form-label col-form-label-sm col-3">İl</label>
+            <div class="col-9">
+                <select id="city" class="form-select form-select-sm" @bind="selectedCity" @bind:event="onchange" required>
+                    <option value="">Şehir Seçiniz!</option>
+                    @foreach (var city in Iller)
                     {
-                        foreach (var neighborhood in selectedIlce.Mahalleler)
-                        {
-                            <option value="@neighborhood.MahalleName">@neighborhood.MahalleName</option>
-                        }
+                        <option value="@city.IlName">@city.IlName</option>
                     }
-                }
-            }
-        </select>
-    </div>
+                </select>
+            </div>
+        </div>
 
-    <div class="mb-3">
-        <label for="street" class="form-label col-form-label-sm">Sokak:</label>
-        <select id="street" class="form-select form-control-sm" @bind="newAddress.Street">
-            <option value="">Lütfen seçiniz</option>
-            @if (!string.IsNullOrEmpty(selectedNeighborhood))
-            {
-                var selectedIl = Iller.FirstOrDefault(x => x.Ilceler.Any(d => d.IlceName == selectedDistrict));
-                if (selectedIl != null)
-                {
-                    var selectedIlce = selectedIl.Ilceler.FirstOrDefault(d => d.IlceName == selectedDistrict);
-                    if (selectedIlce != null)
+        <!-- İlçe Seçimi -->
+        <div class="mb-2 row">
+            <label for="district" class="form-label col-form-label-sm col-3">İlçe</label>
+            <div class="col-9">
+                <select id="district" class="form-select form-select-sm" @bind="selectedDistrict" @bind:event="onchange" required>
+                    <option value="">İlçe Seçiniz!</option>
+                    @if (!string.IsNullOrEmpty(selectedCity))
                     {
-                        var selectedMahalle = selectedIlce.Mahalleler.FirstOrDefault(m => m.MahalleName == selectedNeighborhood);
-                        if (selectedMahalle != null)
+                        var selectedIl = Iller.FirstOrDefault(x => x.IlName == selectedCity);
+                        if (selectedIl != null)
                         {
-                            foreach (var street in selectedMahalle.Sokaklar)
+                            foreach (var district in selectedIl.Ilceler)
                             {
-                                <option value="@street">@street</option>
+                                <option value="@district.IlceName">@district.IlceName</option>
                             }
                         }
                     }
-                }
-            }
-        </select>
-    </div>
+                </select>
+            </div>
+        </div>
 
-    <!-- Adres Başlığı -->
-    <div class="mb-3">
-        <label class="form-label col-form-label-sm">Adres Başlığı:</label>
-        <div>
-            <div>
-                <input type="radio" id="home" name="adresBasligi" value="Ev Adresi" @onchange="OnAddressTitleChange" />
-                <label for="home">
-                    <i class="bi bi-house-door"></i> Ev
-                </label>
+        <!-- Mahalle Seçimi -->
+        <div class="mb-2 row">
+            <label for="neighborhood" class="form-label col-form-label-sm col-3">Mahalle</label>
+            <div class="col-9">
+                <select id="neighborhood" class="form-select form-select-sm" @bind="selectedNeighborhood" @bind:event="onchange" required>
+                    <option value="">Mahalle Seçiniz!</option>
+                    @if (!string.IsNullOrEmpty(selectedDistrict))
+                    {
+                        var selectedIl = Iller.FirstOrDefault(x => x.Ilceler.Any(d => d.IlceName == selectedDistrict));
+                        if (selectedIl != null)
+                        {
+                            var selectedIlce = selectedIl.Ilceler.FirstOrDefault(d => d.IlceName == selectedDistrict);
+                            if (selectedIlce != null)
+                            {
+                                foreach (var neighborhood in selectedIlce.Mahalleler)
+                                {
+                                    <option value="@neighborhood.MahalleName">@neighborhood.MahalleName</option>
+                                }
+                            }
+                        }
+                    }
+                </select>
             </div>
-            <div>
-                <input type="radio" id="work" name="adresBasligi" value="İş Adresi" @onchange="OnAddressTitleChange" />
-                <label for="work">
-                    <i class="bi bi-briefcase"></i> İş
-                </label>
+        </div>
+
+        <!-- Posta Kodu -->
+        <div class="mb-2 row">
+            <label for="postaKodu" class="form-label col-form-label-sm col-3">Posta Kodu</label>
+            <div class="col-9">
+                <input type="text" id="postaKodu" class="form-control form-control-sm" @bind="newAddress.postaKodu" placeholder="Posta Kodu" required />
             </div>
-            <div>
-                <input type="radio" id="other" name="adresBasligi" value="Diğer" @onchange="OnAddressTitleChange" />
-                <label for="other">
-                    <i class="bi bi-info-circle"></i> Diğer
-                </label>
+        </div>
+
+        <!-- Açık Adres -->
+        <div class="mb-2 row">
+            <label for="acikAdres" class="form-label col-form-label-sm col-3">Adres</label>
+            <div class="col-9">
+                <textarea id="acikAdres" class="form-control form-control-sm" @bind="newAddress.AcikAdres" placeholder="Adres" rows="4" required></textarea>
+            </div>
+        </div>
+
+        <!-- Default Checkbox -->
+        <div class="mb-2 row align-items-center">
+            <div class="col-3"></div>
+            <div class="col-9">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="" id="defaultCheck1">
+                    <label class="form-check-label col-form-label-sm" for="defaultCheck1">
+                        Default 
+                    </label>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Açık Adres -->
-    <div class="mb-3">
-        <label for="acikAdres" class="form-label col-form-label-sm">Açık Adres:</label>
-        <textarea id="acikAdres" class="form-control form-control-sm" @bind="newAddress.AcikAdres" placeholder="Açık Adres"></textarea>
-    </div>
-
-    <div class="m-2 text-end">
-        <button type="submit" class="btn btn-sm btn-primary"><i class="bi bi-check-lg"></i>Kaydet</button>
+    <!-- Kaydet Butonu -->
+    <div class="row">
+        <div class="col text-start">
+            <button type="button" class="btn btn-sm btn-outline-secondary w-50"> İptal</button>
+        </div>
+        <div class="col text-end">
+            <button type="submit" class="btn btn-sm btn-primary w-50"> Tamam</button>
+        </div>
     </div>
 </EditForm>
 
+<style>
+    .btn-check {
+        display: none; 
+    } 
+    .btn-check:not(:checked) + label:hover {
+        background-color: #e9ecef; 
+        color: #495057; 
+    }
+
+    .blazored-modal.my-size {
+       max-width: 700px;
+       margin: auto;
+    }
+    
+    .bm-header{
+        padding: 1rem 0 0 0!important;
+    }
+    .bm-title{
+        font-size:x-large;
+    }
+
+    </style>
 
 @code {
+
     [Parameter] public Address AddressToEdit { get; set; }
     private Address newAddress = new Address();
     private List<Address> addresses = new List<Address>();
@@ -135,7 +182,7 @@
     private string selectedCity;
     private string selectedDistrict;
     private string selectedNeighborhood;
-    private List<string> streets;
+    // private List<string> streets;
 
 
 
@@ -159,12 +206,12 @@
                         new Mahalle
                         {
                             MahalleName = "Fenerbahçe",
-                            Sokaklar = new List<string> { "Bağdat Caddesi", "Fenerbahçe Sokak" }
+                            // Sokaklar = new List<string> { "Bağdat Caddesi", "Fenerbahçe Sokak" }
                         },
                         new Mahalle
                         {
                             MahalleName = "Moda",
-                            Sokaklar = new List<string> { "Moda Caddesi", "Şair Nefi Sokak" }
+                            // Sokaklar = new List<string> { "Moda Caddesi", "Şair Nefi Sokak" }
                         }
                     }
                 },
@@ -176,12 +223,12 @@
                         new Mahalle
                         {
                             MahalleName = "Etiler",
-                            Sokaklar = new List<string> { "Nispetiye Caddesi", "Levent Caddesi" }
+                            // Sokaklar = new List<string> { "Nispetiye Caddesi", "Levent Caddesi" }
                         },
                         new Mahalle
                         {
                             MahalleName = "Levent",
-                            Sokaklar = new List<string> { "Büyükdere Caddesi", "Eski Büyükdere Yolu" }
+                            // Sokaklar = new List<string> { "Büyükdere Caddesi", "Eski Büyükdere Yolu" }
                         }
                     }
                 }
@@ -200,12 +247,12 @@
                         new Mahalle
                         {
                             MahalleName = "Ayrancı",
-                            Sokaklar = new List<string> { "Atatürk Bulvarı", "Hoşdere Caddesi" }
+                            // Sokaklar = new List<string> { "Atatürk Bulvarı", "Hoşdere Caddesi" }
                         },
                         new Mahalle
                         {
                             MahalleName = "Bahçelievler",
-                            Sokaklar = new List<string> { "7. Cadde", "Milli Kütüphane Sokak" }
+                            // Sokaklar = new List<string> { "7. Cadde", "Milli Kütüphane Sokak" }
                         }
                     }
                 }
@@ -224,12 +271,12 @@
                         new Mahalle
                         {
                             MahalleName = "Yahya Kaptan",
-                            Sokaklar = new List<string> { "Kaptan Caddesi", "Doğu Sokak" }
+                            // Sokaklar = new List<string> { "Kaptan Caddesi", "Doğu Sokak" }
                         },
                         new Mahalle
                         {
                             MahalleName = "Cumhuriyet",
-                            Sokaklar = new List<string> { "İnönü Caddesi", "Park Sokak" }
+                            // Sokaklar = new List<string> { "İnönü Caddesi", "Park Sokak" }
                         }
                     }
                 },
@@ -241,12 +288,12 @@
                         new Mahalle
                         {
                             MahalleName = "Beylikbağı",
-                            Sokaklar = new List<string> { "Fatih Caddesi", "Sanayi Sokak" }
+                            // Sokaklar = new List<string> { "Fatih Caddesi", "Sanayi Sokak" }
                         },
                         new Mahalle
                         {
                             MahalleName = "Mustafapaşa",
-                            Sokaklar = new List<string> { "Atatürk Caddesi", "Çarşı Sokak" }
+                            // Sokaklar = new List<string> { "Atatürk Caddesi", "Çarşı Sokak" }
                         }
                     }
                 }
@@ -264,11 +311,13 @@
                 {
                     AdresBasligi = AddressToEdit.AdresBasligi,
                     AcikAdres = AddressToEdit.AcikAdres,
+                    Tanimi = AddressToEdit.Tanimi,
+                    postaKodu = AddressToEdit.postaKodu,
                     Country = AddressToEdit.Country,
                     City = AddressToEdit.City,
                     District = AddressToEdit.District,
                     Neighborhood = AddressToEdit.Neighborhood,
-                    Street = AddressToEdit.Street // Eğer varsa
+                    // Street = AddressToEdit.Street // Eğer varsa
                 };
 
             selectedCountry = AddressToEdit.Country;
@@ -277,11 +326,14 @@
             selectedNeighborhood = AddressToEdit.Neighborhood;
         }
     }
+    private string selectedAddressTitle = "Ev Adresi";
 
     private void OnAddressTitleChange(ChangeEventArgs e)
     {
-        newAddress.AdresBasligi = e.Value.ToString(); 
+        selectedAddressTitle = e.Value.ToString();
+        newAddress.AdresBasligi = selectedAddressTitle;
     }
+
 
     [CascadingParameter] BlazoredModalInstance BlazoredModal { get; set; } = default!;
     private async Task HandleValidSubmit()

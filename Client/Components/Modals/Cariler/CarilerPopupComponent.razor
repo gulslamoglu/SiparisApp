@@ -1,0 +1,267 @@
+﻿@* Cari seçimi *@
+<div class="p-1">
+    <div class="small btg-table-caption">Cari seçimi</div>
+    <div class="row mb-1">
+        @* ülke seçimi *@
+        <div class="col-12 col-lg-6">
+            <select class="form-select form-select-sm" @bind="selectedCountry">
+                <option value="">(Tüm Ülkeler)</option>
+                @foreach(var ulke in Ulkeler)
+                {
+                    <option value="@ulke" selected="">@ulke</option>
+                }
+            </select>
+        </div>
+        @* şehir seçimi *@
+        <div class="col-12 col-lg-6">
+            <select class="form-select form-select-sm" @bind="selectedCity">
+                <option value="">(Tüm Şehirler)</option>
+                @foreach(var il in Iller)
+                {
+                    <option value="@il.IlName">@il.IlName</option>
+                }
+            </select>
+        </div>
+    </div>
+    <div class="row mb-1">
+        @* Ilce seçimi *@
+        <div class="col-12 col-lg-6">
+            <select class="form-select form-select-sm" @bind="selectedDistrict">
+                <option value="">(Tüm İlçeler)</option>
+                @if (!string.IsNullOrEmpty(selectedCity))
+                {
+                    var selectedIl = Iller.FirstOrDefault(x => x.IlName == selectedCity);
+                    if (selectedIl != null)
+                    {
+                        foreach(var ilce in selectedIl.Ilceler)
+                        {
+                            <option value="@ilce.IlceName">@ilce.IlceName</option>
+                        }
+                    }
+                }
+            </select>
+        </div>
+        @* mahalle seçimi *@
+        <div class="col-12 col-lg-6">
+            <select class="form-select form-select-sm" @bind= "selectedNeighborhood">
+                <option value="">(Tüm Mahalleler)</option>
+                @if (!string.IsNullOrEmpty(selectedDistrict))
+                {
+                    var selectedil = Iller.FirstOrDefault(x => x.Ilceler.Any(d => d.IlceName == selectedDistrict));
+                    if (selectedil != null)
+                    {
+                        var selectedIlce = selectedil.Ilceler.FirstOrDefault(d => d.IlceName == selectedDistrict);
+                        if (selectedIlce != null)
+                        {
+                            foreach (var neighborhood in selectedIlce.Mahalleler)
+                            {
+                                <option value="@neighborhood.MahalleName">@neighborhood.MahalleName</option>
+                            }
+                        }
+                    }
+                }
+            </select>
+        </div>
+    </div>
+    @* filtre seçimi *@
+    <div class="row  mb-1">
+        <div class="col-12 col-lg-6">
+            <select class="form-select form-select-sm" onchange="$('#CariAra').focus().select();">
+                <option value="Ad">Ad/Ünvan</option>
+                <option value="Telefon">Telefon</option>
+                <option value="Id">TC/Vergi No</option>
+                <option value="Adres">Adres (Sokak, Cadde, Site, Apartman)</option>
+            </select>
+        </div>
+        @* text filtre *@
+        <div class="col-12 col-lg-6">
+            <div class="input-group input-group-sm">
+                <input id="CariAra" class="form-control form-control-sm" placeholder="Aranacak değer">
+                <button class="btn btn-sm btn-outline-primary"><i class="bi bi-search"></i></button>
+            </div>
+
+        </div>
+    </div>
+    @* yeni cari ekle butonu *@
+    <div class="my-1 text-end">
+        <button class="btn btn-sm btn-outline-primary small"> <i class="bi bi-plus-lg"></i> Yeni Cari Ekle</button>
+    </div>
+    @* Cariler Tablosu *@
+    <div class="p-2 border border-1" style="height: 200px; max-width: 100%; overflow: auto">
+        <table class="table table-sm table-hover small table-borderless ">
+            <tbody>
+                @foreach(var item in Cariler)
+                {
+                    <tr style="cursor: pointer" onclick="btg_Siparis_Cari_sec(this);">
+                        <td nowrap=""><i class="bi bi-person"></i>@item.Id</td>
+                        <td nowrap="">@item.Ad</td>
+                        <td nowrap="">@item.Telefon</td>
+                        <td nowrap="">@item.Adres</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    @* Cariler sayısı ve çıkış*@
+    <div class="p-2 " style=" height: 40px;">
+        <div class="btg-dd-spinner spinner-grow spinner-border-sm text-dark align-middle" style="width: 22px; height: 22px; display: none;" role="status">
+            <span class="visually-hidden">Aranıyor</span>
+        </div>
+        <span class="btg-dd-status-text text-muted small fst-italic">@Cariler.Count() adet cari listeleniyor.</span>
+        <a class="btn-link btg-btn-cancel  float-end" href="javascript:;"><i class="bi bi-x"></i></a>
+    </div>
+
+</div>
+
+<style>
+    .blazored-modal{
+        padding: 0.5rem!important;
+    }
+</style>
+
+@code {
+    private List<Cari> Cariler = new List<Cari>
+    {
+        new Cari {Id = 0014839, Ad= "BURHAN GÜLER" , Telefon= "(505) 689 19 85", Adres= "SAHİL MAH - Beylikdüzü / İSTANBUL"},
+        new Cari {Id = 0014840, Ad= "İHLAS PAZARLAMA A.Ş" , Telefon= "(212) 444 49 49", Adres= "YENİBOSNA MERKEZ MAH - BAHÇELİEVLER / İSTANBUL"},
+        new Cari {Id = 0014841, Ad= "MUHAMMED CİNDİOĞLU" , Telefon= "(505) 689 19 85", Adres= "KAYAŞEHİR MAH - BAŞAKŞEHİR / İSTANBUL"},
+        new Cari {Id = 0014842, Ad= "TGSOFT YAZILIM VE DANIŞMALLIK LTD. ŞTİ." , Telefon= "(505) 689 19 85", Adres= "SAHİL MAH - BEYLİKDÜZÜ / İSTANBUL"}
+    };
+
+    private List<Address> addresses = new List<Address>();
+    private string selectedCountry;
+    private string selectedCity;
+    private string selectedDistrict;
+    private string selectedNeighborhood;
+    private List<string> streets;
+
+
+
+    string[] Ulkeler =
+       {
+        "TÜRKİYE"
+    };
+
+    private List<Il> Iller = new List<Il>
+    {
+        new Il
+        {
+            IlName = "İstanbul",
+            Ilceler = new List<Ilce>
+            {
+                new Ilce
+                {
+                    IlceName = "Beylikdüzü",
+                    Mahalleler = new List<Mahalle>
+                    {
+                        new Mahalle
+                        {
+                            MahalleName = "SAHİL MAH",
+                            Sokaklar = new List<string> { "Bağdat Caddesi", "Fenerbahçe Sokak" }
+                        },
+                        new Mahalle
+                        {
+                            MahalleName = "Vadi MAH",
+                            Sokaklar = new List<string> { "Moda Caddesi", "Şair Nefi Sokak" }
+                        }
+                    }
+                },
+                new Ilce
+                {
+                    IlceName = "BAHÇELİEVLER",
+                    Mahalleler = new List<Mahalle>
+                    {
+                        new Mahalle
+                        {
+                            MahalleName = "YENİBOSNA MERKEZ MAH",
+                            Sokaklar = new List<string> { "Nispetiye Caddesi", "Levent Caddesi" }
+                        },
+                        new Mahalle
+                        {
+                            MahalleName = "29 EKİM CUMHURİYET MAH",
+                            Sokaklar = new List<string> { "Büyükdere Caddesi", "Eski Büyükdere Yolu" }
+                        }
+                    }
+                },
+                new Ilce
+                {
+                    IlceName = "BAŞAKŞEHİR",
+                    Mahalleler = new List<Mahalle>
+                    {
+                        new Mahalle
+                        {
+                            MahalleName = "KAYAŞEHİR MAH",
+                            Sokaklar = new List<string> { "a Caddesi", "b Caddesi" }
+                        }
+                    }
+                }
+            }
+        },
+        new Il
+        {
+            IlName = "Ankara",
+            Ilceler = new List<Ilce>
+            {
+                new Ilce
+                {
+                    IlceName = "Çankaya",
+                    Mahalleler = new List<Mahalle>
+                    {
+                        new Mahalle
+                        {
+                            MahalleName = "Ayrancı",
+                            Sokaklar = new List<string> { "Atatürk Bulvarı", "Hoşdere Caddesi" }
+                        },
+                        new Mahalle
+                        {
+                            MahalleName = "Bahçelievler",
+                            Sokaklar = new List<string> { "7. Cadde", "Milli Kütüphane Sokak" }
+                        }
+                    }
+                }
+            }
+        },
+        new Il
+        {
+            IlName = "Kocaeli",
+            Ilceler = new List<Ilce>
+            {
+                new Ilce
+                {
+                    IlceName = "İzmit",
+                    Mahalleler = new List<Mahalle>
+                    {
+                        new Mahalle
+                        {
+                            MahalleName = "Yahya Kaptan",
+                            Sokaklar = new List<string> { "Kaptan Caddesi", "Doğu Sokak" }
+                        },
+                        new Mahalle
+                        {
+                            MahalleName = "Cumhuriyet",
+                            Sokaklar = new List<string> { "İnönü Caddesi", "Park Sokak" }
+                        }
+                    }
+                },
+                new Ilce
+                {
+                    IlceName = "Gebze",
+                    Mahalleler = new List<Mahalle>
+                    {
+                        new Mahalle
+                        {
+                            MahalleName = "Beylikbağı",
+                            Sokaklar = new List<string> { "Fatih Caddesi", "Sanayi Sokak" }
+                        },
+                        new Mahalle
+                        {
+                            MahalleName = "Mustafapaşa",
+                            Sokaklar = new List<string> { "Atatürk Caddesi", "Çarşı Sokak" }
+                        }
+                    }
+                }
+            }
+        }
+    };
+
+}

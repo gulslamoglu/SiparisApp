@@ -71,8 +71,7 @@
 
     async Task AddNewAdress()
     {
-        var modalRef = modalService.Show<YeniAdresEklePopUpComponent>(
-            new ModalOptions { HideHeader = true , Size = ModalSize.Small});
+        var modalRef = modalService.Show<YeniAdresEklePopUpComponent>(title: "Adres Ekleme", new ModalOptions { Size = ModalSize.Custom, SizeCustomClass = "my-size" });
 
         var result = await modalRef.Result;
         if (!result.Cancelled)
@@ -89,9 +88,9 @@
 
     async Task EditAddress(Address address)
     {
-        var modalRef = modalService.Show<YeniAdresEklePopUpComponent>(
+        var modalRef = modalService.Show<YeniAdresEklePopUpComponent>(title: "Adres Düzenleme", 
             new ModalParameters().Add("AddressToEdit", address), 
-            new ModalOptions { HideHeader = true, Size = ModalSize.Small } 
+            new ModalOptions { Size = ModalSize.Custom, SizeCustomClass = "my-size" }
         );
 
         var result = await modalRef.Result;

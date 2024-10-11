@@ -15,6 +15,8 @@ namespace SiparisApp.Shared.Models.Adress
         public string Street { get; set; }
         public string AcikAdres { get; set; }
         public string AdresBasligi { get; set; }
+        public string postaKodu { get; set; }
+        public string Tanimi { get; set; }
 
     }
 

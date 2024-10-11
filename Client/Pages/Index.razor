@@ -4,12 +4,9 @@
 
 <div class="btn-group">
     <button class="btn btn-primary mx-3" @onclick="OpenModal">Ürünleri Göster</button>
-
-
     <button class="btn btn-dark mx-3" @onclick="OpenIndirimMasrafModal">İndirim/Masraf Girişlerini göster</button>
-
-
     <button class="btn btn-danger mx-3" @onclick="AdresGoster">Adresleri Göster</button>
+    <button class="btn btn-secondary mx-3" @onclick="Cariler">Carileri Göster</button>
 </div>
 
 @code {
@@ -34,5 +31,11 @@
         var modalRef = Modal.Show<AdresPopUpComponent>(new ModalOptions { HideHeader = true });
 
         var modalResult = modalRef.Result;
+    }
+
+    async Task Cariler()
+    {
+        var modalRef = Modal.Show<CarilerPopupComponent>(new ModalOptions { HideHeader = true });
+        var modalRes = modalRef.Result;
     }
 }
