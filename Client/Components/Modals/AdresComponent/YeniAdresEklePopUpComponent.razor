@@ -1,29 +1,24 @@
-﻿<EditForm Model="newAddress" OnValidSubmit="HandleValidSubmit" class="needs-validation" novalidate>
+﻿
+<EditForm Model="newAddress" OnValidSubmit="HandleValidSubmit" class="needs-validation" novalidate>
     <DataAnnotationsValidator />
-    <ValidationSummary />
 
     <div class="p-4 border border-1 mb-4" style="border-radius:10px">
+
         <!-- Adres Başlığı -->
         <div class="mb-2 row">
-            <label class="form-label  col-3">Türü</label>
+            <label class="form-label col-3">Türü</label>
             <div class="col-9">
-                <div class="btn-group  w-100" role="group" aria-label="Basic radio toggle button group">
-                    <input type="radio" class="btn-check" name="adresBasligi" id="home" autocomplete="off" value="Ev Adresi" @onchange="OnAddressTitleChange" checked>
-                    <label class="btn btn-outline-@(selectedAddressTitle == "Ev Adresi" ? "primary" : "secondary")" for="home">
-                        <i class="bi bi-house-door-fill"></i> Ev
-                    </label>
-
-                    <input type="radio" class="btn-check" name="adresBasligi" id="work" autocomplete="off" value="İş Adresi" @onchange="OnAddressTitleChange">
-                    <label class="btn btn-outline-@(selectedAddressTitle == "İş Adresi" ? "primary" : "secondary")" for="work">
-                        <i class="bi bi-briefcase-fill"></i> İş
-                    </label>
-
-                    <input type="radio" class="btn-check" name="adresBasligi" id="other" autocomplete="off" value="Diğer" @onchange="OnAddressTitleChange">
-                    <label class="btn btn-outline-@(selectedAddressTitle == "Diğer" ? "primary" : "secondary")" for="other">
-                        <i class="bi bi-info-circle-fill"></i> Diğer
-                    </label>
+                <div class="btn-group w-100" role="group" aria-label="Basic radio toggle button group">
+                    @foreach (var title in addressTitles)
+                    {
+                        <input type="radio" class="btn-check" name="adresBasligi" id="@title" value="@title"
+                               @onchange="OnAddressTitleChange" checked="@IsChecked(title)">
+                        <label class="btn btn-outline-@(selectedAddressTitle == title ? "primary" : "secondary")" for="@title">
+                            <i class="bi @(GetIconForTitle(title))"></i> @title
+                        </label>
+                    }
                 </div>
-
+                <ValidationMessage For="@(() => newAddress.AdresBasligi)" />
             </div>
         </div>
 
@@ -31,7 +26,9 @@
         <div class="mb-2 row">
             <label for="tanimi" class="form-label col-form-label-sm col-3">Tanımı</label>
             <div class="col-9">
-                <input type="text" id="tanimi" class="form-control form-control-sm" @bind="newAddress.Tanimi" placeholder="Tanımı" required />
+                <input type="text" id="tanimi" class="form-control form-control-sm"
+                       @bind="newAddress.Tanimi" placeholder="Tanımı" required />
+                <ValidationMessage For="@(() => newAddress.Tanimi)" />
             </div>
         </div>
 
@@ -39,13 +36,14 @@
         <div class="mb-2 row">
             <label for="country" class="form-label col-form-label-sm col-3">Ülke</label>
             <div class="col-9">
-                <select id="country" class="form-select form-select-sm" @bind="selectedCountry" @bind:event="onchange" required>
-                    @* <option value="">Ülke Seçiniz!</option> *@
-                    @foreach (var country in Ulkeler)
+                <select id="country" class="form-select form-select-sm" @bind="newAddress.Country" required>
+                    <option value="">Ülke Seçiniz!</option>
+                    @foreach (var country in Ulke)
                     {
-                        <option value="@country">@country</option>
+                        <option value="@country.ulkeName">@country.ulkeName</option>
                     }
                 </select>
+                <ValidationMessage For="@(() => newAddress.Country)" />
             </div>
         </div>
 
@@ -53,13 +51,14 @@
         <div class="mb-2 row">
             <label for="city" class="form-label col-form-label-sm col-3">İl</label>
             <div class="col-9">
-                <select id="city" class="form-select form-select-sm" @bind="selectedCity" @bind:event="onchange" required>
+                <select id="city" class="form-select form-select-sm" @bind="newAddress.City" required>
                     <option value="">Şehir Seçiniz!</option>
                     @foreach (var city in Iller)
                     {
                         <option value="@city.IlName">@city.IlName</option>
                     }
                 </select>
+                <ValidationMessage For="@(() => newAddress.City)" />
             </div>
         </div>
 
@@ -67,20 +66,14 @@
         <div class="mb-2 row">
             <label for="district" class="form-label col-form-label-sm col-3">İlçe</label>
             <div class="col-9">
-                <select id="district" class="form-select form-select-sm" @bind="selectedDistrict" @bind:event="onchange" required>
+                <select id="district" class="form-select form-select-sm" @bind="newAddress.District" required>
                     <option value="">İlçe Seçiniz!</option>
-                    @if (!string.IsNullOrEmpty(selectedCity))
+                    @foreach (var district in GetDistricts(newAddress.City))
                     {
-                        var selectedIl = Iller.FirstOrDefault(x => x.IlName == selectedCity);
-                        if (selectedIl != null)
-                        {
-                            foreach (var district in selectedIl.Ilceler)
-                            {
-                                <option value="@district.IlceName">@district.IlceName</option>
-                            }
-                        }
+                        <option value="@district.IlceName">@district.IlceName</option>
                     }
                 </select>
+                <ValidationMessage For="@(() => newAddress.District)" />
             </div>
         </div>
 
@@ -88,24 +81,14 @@
         <div class="mb-2 row">
             <label for="neighborhood" class="form-label col-form-label-sm col-3">Mahalle</label>
             <div class="col-9">
-                <select id="neighborhood" class="form-select form-select-sm" @bind="selectedNeighborhood" @bind:event="onchange" required>
+                <select id="neighborhood" class="form-select form-select-sm" @bind="newAddress.Neighborhood" required>
                     <option value="">Mahalle Seçiniz!</option>
-                    @if (!string.IsNullOrEmpty(selectedDistrict))
+                    @foreach (var neighborhood in GetNeighborhoods(newAddress.District))
                     {
-                        var selectedIl = Iller.FirstOrDefault(x => x.Ilceler.Any(d => d.IlceName == selectedDistrict));
-                        if (selectedIl != null)
-                        {
-                            var selectedIlce = selectedIl.Ilceler.FirstOrDefault(d => d.IlceName == selectedDistrict);
-                            if (selectedIlce != null)
-                            {
-                                foreach (var neighborhood in selectedIlce.Mahalleler)
-                                {
-                                    <option value="@neighborhood.MahalleName">@neighborhood.MahalleName</option>
-                                }
-                            }
-                        }
+                        <option value="@neighborhood.MahalleName">@neighborhood.MahalleName</option>
                     }
                 </select>
+                <ValidationMessage For="@(() => newAddress.Neighborhood)" />
             </div>
         </div>
 
@@ -113,7 +96,9 @@
         <div class="mb-2 row">
             <label for="postaKodu" class="form-label col-form-label-sm col-3">Posta Kodu</label>
             <div class="col-9">
-                <input type="text" id="postaKodu" class="form-control form-control-sm" @bind="newAddress.postaKodu" placeholder="Posta Kodu" required />
+                <input type="text" id="postaKodu" class="form-control form-control-sm"
+                       @bind="newAddress.postaKodu" placeholder="Posta Kodu" required />
+                <ValidationMessage For="@(() => newAddress.postaKodu)" />
             </div>
         </div>
 
@@ -121,7 +106,9 @@
         <div class="mb-2 row">
             <label for="acikAdres" class="form-label col-form-label-sm col-3">Adres</label>
             <div class="col-9">
-                <textarea id="acikAdres" class="form-control form-control-sm" @bind="newAddress.AcikAdres" placeholder="Adres" rows="4" required></textarea>
+                <textarea id="acikAdres" class="form-control form-control-sm"
+                          @bind="newAddress.AcikAdres" placeholder="Adres" rows="4" required></textarea>
+                <ValidationMessage For="@(() => newAddress.AcikAdres)" />
             </div>
         </div>
 
@@ -130,9 +117,10 @@
             <div class="col-3"></div>
             <div class="col-9">
                 <div class="form-check">
-                    <input class="form-check-input" type="checkbox" value="" id="defaultCheck1">
+                    <input class="form-check-input" type="checkbox" value="true"
+                           @bind="@newAddress.IsDefault" id="defaultCheck1">
                     <label class="form-check-label col-form-label-sm" for="defaultCheck1">
-                        Default 
+                        Default
                     </label>
                 </div>
             </div>
@@ -142,7 +130,10 @@
     <!-- Kaydet Butonu -->
     <div class="row">
         <div class="col text-start">
-            <button type="button" class="btn btn-sm btn-outline-secondary w-50"> İptal</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary w-25" > İptal</button>
+        </div>
+        <div class="col text-center">
+            <button type="button" class="btn btn-sm btn-outline-secondary w-25">Sil </button>
         </div>
         <div class="col text-end">
             <button type="submit" class="btn btn-sm btn-primary w-50"> Tamam</button>
@@ -178,17 +169,14 @@
     [Parameter] public Address AddressToEdit { get; set; }
     private Address newAddress = new Address();
     private List<Address> addresses = new List<Address>();
-    private string selectedCountry;
-    private string selectedCity;
-    private string selectedDistrict;
-    private string selectedNeighborhood;
-    // private List<string> streets;
+    private string selectedAddressTitle= "Ev Adresi";
+    private List<string> addressTitles = new List<string> { "Ev Adresi", "İş Adresi", "Diğer" };
 
 
-
-    string[] Ulkeler =
-       {
-        "TÜRKİYE"
+    private List<Country> Ulke = new List<Country>
+    {
+        new Country {ulkeName= "Türkiye"},
+        new Country {ulkeName= "Fransa"}
     };
 
     private List<Il> Iller = new List<Il>
@@ -308,7 +296,7 @@
         if (AddressToEdit != null)
         {
             newAddress = new Address
-                {
+            {
                     AdresBasligi = AddressToEdit.AdresBasligi,
                     AcikAdres = AddressToEdit.AcikAdres,
                     Tanimi = AddressToEdit.Tanimi,
@@ -316,17 +304,11 @@
                     Country = AddressToEdit.Country,
                     City = AddressToEdit.City,
                     District = AddressToEdit.District,
-                    Neighborhood = AddressToEdit.Neighborhood,
-                    // Street = AddressToEdit.Street // Eğer varsa
-                };
+                    Neighborhood = AddressToEdit.Neighborhood
+            };
 
-            selectedCountry = AddressToEdit.Country;
-            selectedCity = AddressToEdit.City;
-            selectedDistrict = AddressToEdit.District;
-            selectedNeighborhood = AddressToEdit.Neighborhood;
         }
     }
-    private string selectedAddressTitle = "Ev Adresi";
 
     private void OnAddressTitleChange(ChangeEventArgs e)
     {
@@ -334,15 +316,32 @@
         newAddress.AdresBasligi = selectedAddressTitle;
     }
 
+    private bool IsChecked(string title) => selectedAddressTitle == title;
+
+    private string GetIconForTitle(string title) => title switch
+    {
+        "Ev Adresi" => "bi-house-door-fill",
+        "İş Adresi" => "bi-briefcase-fill",
+        "Diğer" => "bi-info-circle-fill",
+        _ => string.Empty
+    };
+
+    private IEnumerable<Ilce> GetDistricts(string city)
+    {
+        var selectedIl = Iller.FirstOrDefault(x => x.IlName == city);
+        return selectedIl?.Ilceler ?? new List<Ilce>();
+    }
+
+    private IEnumerable<Mahalle> GetNeighborhoods(string district)
+    {
+        var selectedIlce = GetDistricts(newAddress.City).FirstOrDefault(x => x.IlceName == district);
+        return selectedIlce?.Mahalleler ?? new List<Mahalle>();
+    }
+
 
     [CascadingParameter] BlazoredModalInstance BlazoredModal { get; set; } = default!;
     private async Task HandleValidSubmit()
     {
-        newAddress.Country = selectedCountry;
-        newAddress.City = selectedCity;
-        newAddress.District = selectedDistrict;
-        newAddress.Neighborhood = selectedNeighborhood;
-
         addresses.Add(newAddress);
         await BlazoredModal.CloseAsync(ModalResult.Ok(newAddress));
     }

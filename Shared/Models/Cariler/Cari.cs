@@ -12,6 +12,6 @@ namespace SiparisApp.Shared.Models.Cariler
         public string Ad { get; set; }
         public string Soyad { get; set; }
         public string Telefon { get; set; }
-        public string Adres { get; set; }
+        public int AdresId { get; set; }
     }
 }

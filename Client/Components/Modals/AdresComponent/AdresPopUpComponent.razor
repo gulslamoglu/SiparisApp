@@ -1,4 +1,6 @@
-﻿@* Baslik *@
+﻿@inject IJSRuntime jsRuntime
+
+@* Baslik *@
 <div class="small btg-table-caption my-1">AURA CEBILON PLATINUM M5 Teslim Adresi</div>
 
 
@@ -15,9 +17,9 @@
         <tbody>
             @foreach(var item in GetAdres)
             {
-                <tr style="cursor: pointer" @onclick="@(() => EditAddress(item))">
+                <tr style="cursor: pointer">
                     <td>
-                        <div class="fw-bold">
+                        <div class="fw-bold" @onclick="@(() => EditAddress(item))">
                             @if (item.AdresBasligi == "Ev Adresi")
                             {
                                 <i class="bi bi-house-door"></i>
@@ -35,6 +37,9 @@
                         <div class="ps-2 text-muted">
                             @item.AcikAdres
                         </div>
+                    </td>
+                    <td class="text-end">
+                        <button class="btn btn-sm btn-outline-danger" @onclick="@(e => DeleteAddress(item))"><i class="bi bi-x-lg"></i></button>
                     </td>
                 </tr>
             }
@@ -109,5 +114,13 @@
             }
         }
     }
-
+    async Task DeleteAddress(Address address)
+    {
+        bool confirmed = await jsRuntime.InvokeAsync<bool>("confirm", $"Adresi silmek istediğinize emin misiniz?");
+        if (confirmed)
+        {
+            GetAdres.Remove(address);
+            StateHasChanged();
+        }
+    }
 }

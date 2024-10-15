@@ -1,20 +1,21 @@
-﻿@* Cari seçimi *@
+﻿@using System.Globalization
+@* Cari seçimi *@ 
 <div class="p-1">
     <div class="small btg-table-caption">Cari seçimi</div>
     <div class="row mb-1">
         @* ülke seçimi *@
         <div class="col-12 col-lg-6">
-            <select class="form-select form-select-sm" @bind="selectedCountry">
+            <select class="form-select form-select-sm" @bind="filteraddress.Country">
                 <option value="">(Tüm Ülkeler)</option>
-                @foreach(var ulke in Ulkeler)
+                @foreach(var ulke in Ulke)
                 {
-                    <option value="@ulke" selected="">@ulke</option>
+                    <option value="@ulke.ulkeName">@ulke.ulkeName</option>
                 }
             </select>
         </div>
         @* şehir seçimi *@
         <div class="col-12 col-lg-6">
-            <select class="form-select form-select-sm" @bind="selectedCity">
+            <select class="form-select form-select-sm" @bind="filteraddress.City">
                 <option value="">(Tüm Şehirler)</option>
                 @foreach(var il in Iller)
                 {
@@ -26,39 +27,21 @@
     <div class="row mb-1">
         @* Ilce seçimi *@
         <div class="col-12 col-lg-6">
-            <select class="form-select form-select-sm" @bind="selectedDistrict">
+            <select class="form-select form-select-sm" @bind="filteraddress.District" >
                 <option value="">(Tüm İlçeler)</option>
-                @if (!string.IsNullOrEmpty(selectedCity))
+                @foreach (var ilce in GetDistricts(filteraddress.City))
                 {
-                    var selectedIl = Iller.FirstOrDefault(x => x.IlName == selectedCity);
-                    if (selectedIl != null)
-                    {
-                        foreach(var ilce in selectedIl.Ilceler)
-                        {
-                            <option value="@ilce.IlceName">@ilce.IlceName</option>
-                        }
-                    }
+                    <option value="@ilce.IlceName">@ilce.IlceName</option>
                 }
             </select>
         </div>
         @* mahalle seçimi *@
         <div class="col-12 col-lg-6">
-            <select class="form-select form-select-sm" @bind= "selectedNeighborhood">
+            <select class="form-select form-select-sm" @bind= "filteraddress.Neighborhood">
                 <option value="">(Tüm Mahalleler)</option>
-                @if (!string.IsNullOrEmpty(selectedDistrict))
+                @foreach (var mahalle in GetNeighborhoods(filteraddress.District))
                 {
-                    var selectedil = Iller.FirstOrDefault(x => x.Ilceler.Any(d => d.IlceName == selectedDistrict));
-                    if (selectedil != null)
-                    {
-                        var selectedIlce = selectedil.Ilceler.FirstOrDefault(d => d.IlceName == selectedDistrict);
-                        if (selectedIlce != null)
-                        {
-                            foreach (var neighborhood in selectedIlce.Mahalleler)
-                            {
-                                <option value="@neighborhood.MahalleName">@neighborhood.MahalleName</option>
-                            }
-                        }
-                    }
+                    <option value="@mahalle.MahalleName">@mahalle.MahalleName</option>
                 }
             </select>
         </div>
@@ -66,7 +49,7 @@
     @* filtre seçimi *@
     <div class="row  mb-1">
         <div class="col-12 col-lg-6">
-            <select class="form-select form-select-sm" onchange="$('#CariAra').focus().select();">
+            <select class="form-select form-select-sm" @bind="searchType">
                 <option value="Ad">Ad/Ünvan</option>
                 <option value="Telefon">Telefon</option>
                 <option value="Id">TC/Vergi No</option>
@@ -76,10 +59,9 @@
         @* text filtre *@
         <div class="col-12 col-lg-6">
             <div class="input-group input-group-sm">
-                <input id="CariAra" class="form-control form-control-sm" placeholder="Aranacak değer">
-                <button class="btn btn-sm btn-outline-primary"><i class="bi bi-search"></i></button>
+                <input id="CariAra" class="form-control form-control-sm" placeholder="Aranacak değer" @bind="searchTerm">
+                <button class="btn btn-sm btn-outline-primary" @onclick="ApplyFilters"><i class="bi bi-search"></i></button>
             </div>
-
         </div>
     </div>
     @* yeni cari ekle butonu *@
@@ -90,13 +72,14 @@
     <div class="p-2 border border-1" style="height: 200px; max-width: 100%; overflow: auto">
         <table class="table table-sm table-hover small table-borderless ">
             <tbody>
-                @foreach(var item in Cariler)
+                @foreach(var item in FilteredCariler)
                 {
                     <tr style="cursor: pointer" onclick="btg_Siparis_Cari_sec(this);">
                         <td nowrap=""><i class="bi bi-person"></i>@item.Id</td>
                         <td nowrap="">@item.Ad</td>
                         <td nowrap="">@item.Telefon</td>
-                        <td nowrap="">@item.Adres</td>
+                        <td nowrap="">@adres.FirstOrDefault(a => a.Id == item.AdresId)?.AcikAdres</td>
+
                     </tr>
                 }
             </tbody>
@@ -107,7 +90,7 @@
         <div class="btg-dd-spinner spinner-grow spinner-border-sm text-dark align-middle" style="width: 22px; height: 22px; display: none;" role="status">
             <span class="visually-hidden">Aranıyor</span>
         </div>
-        <span class="btg-dd-status-text text-muted small fst-italic">@Cariler.Count() adet cari listeleniyor.</span>
+        <span class="btg-dd-status-text text-muted small fst-italic">@FilteredCariler.Count() adet cari listeleniyor.</span>
         <a class="btn-link btg-btn-cancel  float-end" href="javascript:;"><i class="bi bi-x"></i></a>
     </div>
 
@@ -122,24 +105,17 @@
 @code {
     private List<Cari> Cariler = new List<Cari>
     {
-        new Cari {Id = 0014839, Ad= "BURHAN GÜLER" , Telefon= "(505) 689 19 85", Adres= "SAHİL MAH - Beylikdüzü / İSTANBUL"},
-        new Cari {Id = 0014840, Ad= "İHLAS PAZARLAMA A.Ş" , Telefon= "(212) 444 49 49", Adres= "YENİBOSNA MERKEZ MAH - BAHÇELİEVLER / İSTANBUL"},
-        new Cari {Id = 0014841, Ad= "MUHAMMED CİNDİOĞLU" , Telefon= "(505) 689 19 85", Adres= "KAYAŞEHİR MAH - BAŞAKŞEHİR / İSTANBUL"},
-        new Cari {Id = 0014842, Ad= "TGSOFT YAZILIM VE DANIŞMALLIK LTD. ŞTİ." , Telefon= "(505) 689 19 85", Adres= "SAHİL MAH - BEYLİKDÜZÜ / İSTANBUL"}
+        new Cari {Id = 14839, Ad= "BURHAN GÜLER" , Telefon= "(505) 689 19 85", AdresId= 1},
+        new Cari {Id = 14840, Ad= "İHLAS PAZARLAMA A.Ş" , Telefon= "(212) 444 49 49", AdresId= 2},
+        new Cari {Id = 14841, Ad= "MUHAMMED CİNDİOĞLU" , Telefon= "(505) 689 19 85", AdresId= 3},
+        new Cari {Id = 14842, Ad= "TGSOFT YAZILIM VE DANIŞMALLIK LTD. ŞTİ." , Telefon= "(545) 877 08 43",AdresId= 1}
     };
 
-    private List<Address> addresses = new List<Address>();
-    private string selectedCountry;
-    private string selectedCity;
-    private string selectedDistrict;
-    private string selectedNeighborhood;
-    private List<string> streets;
 
-
-
-    string[] Ulkeler =
-       {
-        "TÜRKİYE"
+    private List<Country> Ulke = new List<Country>
+    {
+        new Country {ulkeName= "Türkiye"},
+        new Country {ulkeName= "Fransa"}
     };
 
     private List<Il> Iller = new List<Il>
@@ -154,45 +130,25 @@
                     IlceName = "Beylikdüzü",
                     Mahalleler = new List<Mahalle>
                     {
-                        new Mahalle
-                        {
-                            MahalleName = "SAHİL MAH",
-                            Sokaklar = new List<string> { "Bağdat Caddesi", "Fenerbahçe Sokak" }
-                        },
-                        new Mahalle
-                        {
-                            MahalleName = "Vadi MAH",
-                            Sokaklar = new List<string> { "Moda Caddesi", "Şair Nefi Sokak" }
-                        }
+                        new Mahalle{MahalleName = "Sahil Mahallesi"},
+                        new Mahalle{MahalleName = "Vadi Mahallesi"}
                     }
                 },
                 new Ilce
                 {
-                    IlceName = "BAHÇELİEVLER",
+                    IlceName = "Bahçelievler",
                     Mahalleler = new List<Mahalle>
                     {
-                        new Mahalle
-                        {
-                            MahalleName = "YENİBOSNA MERKEZ MAH",
-                            Sokaklar = new List<string> { "Nispetiye Caddesi", "Levent Caddesi" }
-                        },
-                        new Mahalle
-                        {
-                            MahalleName = "29 EKİM CUMHURİYET MAH",
-                            Sokaklar = new List<string> { "Büyükdere Caddesi", "Eski Büyükdere Yolu" }
-                        }
+                        new Mahalle{ MahalleName = "YENİBOSNA MERKEZ MAH" },
+                        new Mahalle{ MahalleName = "29 EKİM CUMHURİYET MAH"}
                     }
                 },
                 new Ilce
                 {
-                    IlceName = "BAŞAKŞEHİR",
+                    IlceName = "Başakşehir",
                     Mahalleler = new List<Mahalle>
                     {
-                        new Mahalle
-                        {
-                            MahalleName = "KAYAŞEHİR MAH",
-                            Sokaklar = new List<string> { "a Caddesi", "b Caddesi" }
-                        }
+                        new Mahalle{ MahalleName = "KAYAŞEHİR MAH"}
                     }
                 }
             }
@@ -207,16 +163,8 @@
                     IlceName = "Çankaya",
                     Mahalleler = new List<Mahalle>
                     {
-                        new Mahalle
-                        {
-                            MahalleName = "Ayrancı",
-                            Sokaklar = new List<string> { "Atatürk Bulvarı", "Hoşdere Caddesi" }
-                        },
-                        new Mahalle
-                        {
-                            MahalleName = "Bahçelievler",
-                            Sokaklar = new List<string> { "7. Cadde", "Milli Kütüphane Sokak" }
-                        }
+                        new Mahalle{ MahalleName = "Ayrancı"},
+                        new Mahalle{ MahalleName = "Bahçelievler"}
                     }
                 }
             }
@@ -231,16 +179,8 @@
                     IlceName = "İzmit",
                     Mahalleler = new List<Mahalle>
                     {
-                        new Mahalle
-                        {
-                            MahalleName = "Yahya Kaptan",
-                            Sokaklar = new List<string> { "Kaptan Caddesi", "Doğu Sokak" }
-                        },
-                        new Mahalle
-                        {
-                            MahalleName = "Cumhuriyet",
-                            Sokaklar = new List<string> { "İnönü Caddesi", "Park Sokak" }
-                        }
+                        new Mahalle{ MahalleName = "Yahya Kaptan"},
+                        new Mahalle{ MahalleName = "Cumhuriyet" }
                     }
                 },
                 new Ilce
@@ -248,20 +188,76 @@
                     IlceName = "Gebze",
                     Mahalleler = new List<Mahalle>
                     {
-                        new Mahalle
-                        {
-                            MahalleName = "Beylikbağı",
-                            Sokaklar = new List<string> { "Fatih Caddesi", "Sanayi Sokak" }
-                        },
-                        new Mahalle
-                        {
-                            MahalleName = "Mustafapaşa",
-                            Sokaklar = new List<string> { "Atatürk Caddesi", "Çarşı Sokak" }
-                        }
+                        new Mahalle{ MahalleName = "Beylikbağı"},
+                        new Mahalle{ MahalleName = "Mustafapaşa"}
                     }
                 }
             }
         }
     };
+
+    private Address filteraddress = new Address();
+
+    private List<Address> adres = new List<Address>
+    {
+        new Address {Id=1, Country= "Türkiye", City="İstanbul", District="Beylikdüzü", Neighborhood="Sahil Mahallesi",AcikAdres= "SAHİL MAH - Beylikdüzü / İSTANBUL" },
+        new Address {Id=2,Country= "Türkiye", City="İstanbul", District="Bahçelievler", Neighborhood="Yenibosna Merkez Mahallesi",AcikAdres= "YENİBOSNA MERKEZ MAH - BAHÇELİEVLER / İSTANBUL" },
+        new Address {Id=3,Country= "Türkiye", City="İstanbul", District="Başakşehir", Neighborhood="Kayaşehir Mahallesi",AcikAdres= "KAYAŞEHİR MAH - BAŞAKŞEHİR / İSTANBUL" },
+
+    };
+    
+    
+
+    private List<Cari> FilteredCariler = new List<Cari>();
+    private string searchType = "Ad";
+    private string searchTerm = "";
+
+
+    protected override void OnInitialized() => ApplyFilters();
+
+
+    private void ApplyFilters()
+    {
+        string searchTermLower = searchTerm.ToLower(new CultureInfo("tr-TR"));
+
+        FilteredCariler = Cariler.Where(c =>
+        (string.IsNullOrEmpty(filteraddress.Country) ||
+         adres.FirstOrDefault(a => a.Id == c.AdresId)?.Country.ToLower(new CultureInfo("tr-TR")).Contains(filteraddress.Country.ToLower(new CultureInfo("tr-TR"))) == true) &&
+        (string.IsNullOrEmpty(filteraddress.City) ||
+         adres.FirstOrDefault(a => a.Id == c.AdresId)?.City.ToLower(new CultureInfo("tr-TR")).Contains(filteraddress.City.ToLower(new CultureInfo("tr-TR"))) == true) &&
+        (string.IsNullOrEmpty(filteraddress.District) ||
+         adres.FirstOrDefault(a => a.Id == c.AdresId)?.District.ToLower(new CultureInfo("tr-TR")).Contains(filteraddress.District.ToLower(new CultureInfo("tr-TR"))) == true) &&
+        (string.IsNullOrEmpty(filteraddress.Neighborhood) ||
+         adres.FirstOrDefault(a => a.Id == c.AdresId)?.Neighborhood.ToLower(new CultureInfo("tr-TR")).Contains(filteraddress.Neighborhood.ToLower(new CultureInfo("tr-TR"))) == true) &&
+        (string.IsNullOrEmpty(searchTerm) || (searchType switch
+        {
+            "Ad" => c.Ad.ToLower(new CultureInfo("tr-TR")).Contains(searchTermLower),
+            "Telefon" => NormalizePhoneNumber(c.Telefon).Contains(NormalizePhoneNumber(searchTerm)),
+            "Id" => c.Id.ToString().Contains(searchTerm),
+            "Adres" => adres.FirstOrDefault(a => a.Id == c.AdresId)?.AcikAdres.ToLower(new CultureInfo("tr-TR")).Contains(searchTermLower) == true,
+            _ => false
+        }))
+        ).ToList();
+    }
+
+
+
+    private string NormalizePhoneNumber(string phoneNumber)
+    {
+        return new string(phoneNumber.Where(char.IsDigit).ToArray());
+    }
+
+
+    private List<Ilce> GetDistricts(string selectedCity)
+    {
+        var il = Iller.FirstOrDefault(i => i.IlName == selectedCity);
+        return il?.Ilceler ?? new List<Ilce>();
+    }
+
+    private List<Mahalle> GetNeighborhoods(string selectedDistrict)
+    {
+        var ilce = Iller.SelectMany(i => i.Ilceler).FirstOrDefault(d => d.IlceName == selectedDistrict);
+        return ilce?.Mahalleler ?? new List<Mahalle>();
+    }
 
 }
