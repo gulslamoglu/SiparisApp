@@ -1,0 +1,557 @@
+﻿<form>
+    <ul class="nav nav-tabs" style="margin: 0 5px;"><li class="nav-item ms-2 "><button class="nav-link py-1 active bg-light" type="button">Genel belgileri</button></li></ul><div class="ipacard card bg-light overflow-hidden mb-3 border-top-0" style="height:calc(100vh - 215px)">
+        <div class="overflow-auto" style="height:calc(100vh - 215px)">
+            <div class="card-body ">
+                <div class="row mb-2">
+                    <div class="col-12 col-sm-6 pe-0">
+                        @* Türü *@
+                        <label class="form-label">Türü / Kodu</label>
+                        <div>
+                            <div class="btn-group ipa-button-group" style="width: 100%">
+                                <button class="btn @(isPerson ? "btn-primary" : "btn-outline-primary")" type="button" @onclick="() => SelectType(true)"><span><!--!--><span class="icon "><i class="bi bi-person-fill" style="transform: rotate(0deg);"></i> </span>  Şahıs</span></button>
+                                <button class="btn @(isPerson ? "btn-outline-primary" : "btn-primary")" type="button" @onclick="() => SelectType(false)"><span><!--!--><span class="icon "><i class="bi bi-building-fill" style="transform: rotate(0deg);"></i> </span>  Kurum</span></button>
+                            </div>
+                            <style>
+                                .ipa-button-group button {
+                                    border-color: rgb(33 37 41 / 30%) !important;
+                                }
+
+                                    .ipa-button-group button.btn-light {
+                                        color: rgb(33 37 41 / 60%) !important;
+                                    }
+                            </style>
+                        </div>
+                    </div>
+                    @* Cinsiyet *@
+                    <div class="col-12 col-sm-6">
+                        <label class="form-label">@((isPerson) ? "Cinsiyet" : "Türü")</label>
+                        <div>
+                            <div class="btn-group ipa-button-group" style="width: 100%">
+                                <button class="btn btn-primary " type="button"><span><!--!--><span class="icon "><i class="bi bi-gender-ambiguous" style="transform: rotate(0deg);"></i> </span>  Bilinmiyor</span></button>
+                                <button class="btn btn-outline-primary " type="button"><span><!--!--><span class="icon "><i class="bi bi-gender-male" style="transform: rotate(0deg);"></i> </span> @((isPerson) ? "Erkek" : "Özel")</span></button>
+                                <button class="btn btn-outline-primary " type="button"><span><!--!--><span class="icon "><i class="bi bi-gender-female" style="transform: rotate(0deg);"></i> </span>  @((isPerson) ? "Kadın" : "Kamu")</span></button>
+                            </div>
+                            <style>
+                                .ipa-button-group button {
+                                    border-color: rgb(33 37 41 / 30%) !important;
+                                }
+
+                                    .ipa-button-group button.btn-light {
+                                        color: rgb(33 37 41 / 60%) !important;
+                                    }
+                            </style>
+                        </div>
+                    </div>
+                    @* Ünvan.Adı,Soyadı *@
+                </div><div class="mb-2">
+                    <label class="form-label">Ünvanı</label>
+                    @if (isPerson == true)
+                    {
+                        <input disabled="disabled" maxlength="250" class="form-control valid" _bl_25="">
+                    }
+                    else
+                    {
+                        <input maxlength="250" class="form-control valid" _bl_25="">
+                    }
+                </div><div class="row mb-2">
+                    <div class="col-12 col-sm-6 pe-0">
+                        <label class="form-label"> @(isPerson ? "Adı" : "Yetki Adı")</label>
+                        <input type="text" class="form-control auto-focus" maxlength="50">
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        <label class="form-label">@(isPerson ? "Soyadı" : "Yetki Soyadı")</label>
+                        <input type="text" class="form-control" maxlength="50">
+                    </div>
+                    @* Tip *@
+                </div><div class="row mb-3">
+                    <div class="col-12 col-sm-6 pe-0">
+                        <label class="form-label">Tip</label>
+                        <div>
+                            <div class="btn-group ipa-button-group" style="width: 100%">
+                                <button class="btn btn-primary " type="button"><span><!--!--><span class="icon "><i class="bi bi-question-circle-fill" style="transform: rotate(0deg);"></i> </span>  Bilinmiyor</span></button>
+                                <button class="btn btn-outline-primary " type="button"><span><!--!--><span class="icon "><i class="bi bi-person-fill-add" style="transform: rotate(0deg);"></i> </span>  Müşteri</span></button>
+                                <button class="btn btn-outline-primary " type="button"><span><!--!--><span class="icon "><i class="bi bi-cart-fill" style="transform: rotate(0deg);"></i> </span>   Satıcı</span></button>
+                                <button class="btn btn-outline-primary " type="button"><span><!--!--><span class="icon "><i class="bi bi-hammer" style="transform: rotate(0deg);"></i> </span>   Avukat</span></button>
+                            </div>
+                            <style>
+                                .ipa-button-group button {
+                                    border-color: rgb(33 37 41 / 30%) !important;
+                                }
+
+                                    .ipa-button-group button.btn-light {
+                                        color: rgb(33 37 41 / 60%) !important;
+                                    }
+                            </style>
+                        </div>
+                    </div>
+                    @* TC *@
+                    <div class="col-12 col-sm-6">
+                        <label class="form-label">@(isPerson ? "TC Kimlik No" : "Vergi No")</label>
+                        <input type="text" class="form-control" maxlength="11">
+                    </div>
+                </div>
+                <div>
+                    @* Telefonlar *@
+                    <div class="mb-1 d-flex align-items-center" style="justify-content: space-between;">
+                        <span class="fs-5">Telefonlar:</span>
+                        <button class="btn btn-success btn-sm" title="Yeni telefon" type="button" @onclick="AddNewPhone">
+                            <span><i class="bi bi-plus-lg"></i></span>
+                        </button>
+                    </div>
+
+                    <div class="border overflow-auto mb-3" style="height: 149px;">
+                        <table class="table table-bordered table-hover mb-0 w-100 irt-table">
+                            <thead>
+                                <tr>
+                                    <th class="text-center" width="1%"><i class="bi bi-check-lg"></i></th>
+                                    <th class="text-center" width="1%">Tip</th>
+                                    <th class="text-center" width="1%">Tanımı</th>
+                                    <th colspan="2">Telefon</th>
+
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Phones.Any() || isAddingNumber)
+                                {
+                                    @foreach (var phone in Phones)
+                                    {
+                                        <tr>
+                                            <td class="text-center"><!--!--><span class="icon p-1"><svg class="svg-inline--fa fa-check text-success" style="transform: rotate(0deg);" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="check" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M438.6 105.4c12.5 12.5 12.5 32.8 0 45.3l-256 256c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L160 338.7 393.4 105.4c12.5-12.5 32.8-12.5 45.3 0z"></path></svg><!-- <i class="fa-solid fa-check text-success" style="transform: rotate(0deg);"></i> Font Awesome fontawesome.com --></span></td>
+                                            <td class="text-center">@phone.Type</td>
+                                            <td class="text-center">@(!string.IsNullOrWhiteSpace(@phone.Tanimi) ? $"{@phone.Tanimi}" : "Belirtilmedi")</td>
+                                            <td>@phone.Code @phone.Number@(!string.IsNullOrWhiteSpace(@phone.Dahili) ? $"-{@phone.Dahili}" : "")</td>
+                                            <td class="text-nowrap" width="1%">
+                                                <!--!--><button class="btn link-primary p-0 p-1" title="Düztenleme telefon" type="button"><span><!--!--><span class="icon "><svg class="svg-inline--fa fa-pencil" style="transform: rotate(0deg);" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="pencil" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M410.3 231l11.3-11.3-33.9-33.9-62.1-62.1L291.7 89.8l-11.3 11.3-22.6 22.6L58.6 322.9c-10.4 10.4-18 23.3-22.2 37.4L1 480.7c-2.5 8.4-.2 17.5 6.1 23.7s15.3 8.5 23.7 6.1l120.3-35.4c14.1-4.2 27-11.8 37.4-22.2L387.7 253.7 410.3 231zM160 399.4l-9.1 22.7c-4 3.1-8.5 5.4-13.3 6.9L59.4 452l23-78.1c1.4-4.9 3.8-9.4 6.9-13.3l22.7-9.1v32c0 8.8 7.2 16 16 16h32zM362.7 18.7L348.3 33.2 325.7 55.8 314.3 67.1l33.9 33.9 62.1 62.1 33.9 33.9 11.3-11.3 22.6-22.6 14.5-14.5c25-25 25-65.5 0-90.5L453.3 18.7c-25-25-65.5-25-90.5 0zm-47.4 168l-144 144c-6.2 6.2-16.4 6.2-22.6 0s-6.2-16.4 0-22.6l144-144c6.2-6.2 16.4-6.2 22.6 0s6.2 16.4 0 22.6z"></path></svg><!-- <i class="fa-solid fa-pencil" style="transform: rotate(0deg);"></i> Font Awesome fontawesome.com --></span></span></button><!--!-->
+                                                <!--!--><button class="btn link-danger p-0 p-1 ms-3" title="Silme telefon" @onclick="@(e => RemovePhone(phone))" type="button"><span><!--!--><span class="icon "><svg class="svg-inline--fa fa-trash" style="transform: rotate(0deg);" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="trash" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z"></path></svg><!-- <i class="fa-solid fa-trash" style="transform: rotate(0deg);"></i> Font Awesome fontawesome.com --></span></span></button>
+                                            </td>
+                                        </tr>
+                                    }
+                                    if (isAddingNumber)
+                                    {
+                                        <tr>
+                                            <td class="text-center"><!--!--><span class="icon p-1"><svg class="svg-inline--fa fa-check text-success" style="transform: rotate(0deg);" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="check" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M438.6 105.4c12.5 12.5 12.5 32.8 0 45.3l-256 256c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L160 338.7 393.4 105.4c12.5-12.5 32.8-12.5 45.3 0z"></path></svg><!-- <i class="fa-solid fa-check text-success" style="transform: rotate(0deg);"></i> Font Awesome fontawesome.com --></span></td>
+                                            <!-- Telefon Tipi Dropdown -->
+                                            <td width="85px">
+                                                <div class="dropdown">
+                                                    <button class="btn btn-outline-secondary dropdown-toggle"
+                                                            type="button"
+                                                            @onclick="ToggleDropdown"
+                                                            aria-expanded="@isDropdownOpen">
+                                                        @newPhoneType
+                                                    </button>
+                                                    @if (isDropdownOpen)
+                                                    {
+                                                        <ul class="dropdown-menu show" style="max-height: 200px; overflow: auto;">
+                                                            @foreach (var type in phoneType)
+                                                            {
+                                                                <li><button class="dropdown-item" type="button" @onclick="() => SelectPhoneType(type)">@type</button></li>
+                                                            }
+                                                        </ul>
+                                                    }
+                                                </div>
+                                            </td>
+                                            <!-- Tanım Input -->
+                                            <td width="85px" style="position: relative;"><input @bind="newPhoneDescription" placeholder="Babam.." maxlength="50" style="min-width: 100px;" class="form-control text-success valid" _bl_31=""></td>
+
+                                            <!-- Telefon Numarası Input -->
+                                            <td width="125px">
+                                                <div class="input-group">
+                                                    <div class="dropdown">
+                                                        <button class="btn btn-outline-secondary dropdown-toggle px-2"
+                                                                type="button"
+                                                                data-bs-toggle="dropdown"
+                                                                aria-expanded="false"
+                                                                style="border-color: var(--bs-border-color)!important;">
+                                                            @selectedCountry
+                                                        </button>
+                                                        <ul class="dropdown-menu" style="max-height: 200px; overflow: auto;">
+                                                            @foreach (var country in countries)
+                                                            {
+                                                                <li>
+                                                                    <button class="dropdown-item" type="button" @onclick="() => SelectCountry(country)">
+                                                                        @($"(+{country.Code})")
+                                                                    </button>
+                                                                </li>
+                                                            }
+                                                        </ul>
+                                                    </div>
+                                                    <input id="phoneInput"
+                                                           class="form-control @(!isInvalid && newPhoneNumber.Length == 14 ? "is-valid" : (isInvalid ? "is-invalid" : ""))"
+                                                           @oninput="OnPhoneNumberChanged"
+                                                           value="@newPhoneNumber"
+                                                           placeholder="(___) ___ __ __"
+                                                           maxlength="14" />
+                                                    <input @bind="dahiliNumber" placeholder="Dahili" class="form-control" maxlength="5" style="max-width: 65px;">
+                                                </div>
+                                            </td>
+
+
+                                            <!-- Kaydet ve İptal Butonları -->
+                                            <td class="text-nowrap tel-btns" width="1%">
+                                                <!--!--><button class="btn link-primary p-0 p-1" title="kaydet" @onclick="ConfirmAddPhone" type="button"><span><!--!--><span class="icon "><svg class="svg-inline--fa fa-check" style="transform: rotate(0deg);" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="check" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M438.6 105.4c12.5 12.5 12.5 32.8 0 45.3l-256 256c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L160 338.7 393.4 105.4c12.5-12.5 32.8-12.5 45.3 0z"></path></svg><!-- <i class="fa-solid fa-check" style="transform: rotate(0deg);"></i> Font Awesome fontawesome.com --></span></span></button><!--!-->
+                                                <!--!--><button class="btn link-danger p-0 p-1 ms-2" title="İptal et" @onclick="CancelAddPhone" type="button"><span><!--!--><span class="icon "><svg class="svg-inline--fa fa-xmark" style="transform: rotate(0deg);" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="xmark" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" data-fa-i2svg=""><path fill="currentColor" d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"></path></svg><!-- <i class="fa-solid fa-xmark" style="transform: rotate(0deg);"></i> Font Awesome fontawesome.com --></span></span></button>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                { <tr><td colspan="100" class="text-center fs-5 text-muted"><div>Telefonlar yok!</div></td></tr>}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <br>
+                <div>
+                    @* Epostalar *@
+                    <div class="mb-1 d-flex align-items-center" style="justify-content: space-between;">
+                        <span class="fs-5">EPostalar:</span>
+                        <button class="btn btn-success btn-sm" title="Yeni eposta" @onclick="AddNewMail" type="button"><span><!--!--><span class="icon "><i class="bi bi-plus-lg" style="transform: rotate(0deg);"></i> </span></span></button>
+                    </div>
+                    <div class="border overflow-auto mb-3" style="height: 149px;">
+                        <table class="table table-bordered table-hover mb-0 w-100 irt-table">
+                            <thead>
+                                <tr>
+                                    <th class="text-center" width="1%"><span><!--!--><span class="icon "><i class="bi bi-check-lg" style="transform: rotate(0deg);"></i> </span></span></th>
+                                    <th width="1%">Tanımı</th>
+                                    <th colspan="2">EPosta</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Emails.Any() || isAddingMail)
+                                {
+                                    @foreach (var email in Emails)
+                                    {
+                                        <tr>
+                                            <td class="text-center"><span class="icon p-1"><svg class="svg-inline--fa fa-check text-success" style="transform: rotate(0deg);" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="check" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M438.6 105.4c12.5 12.5 12.5 32.8 0 45.3l-256 256c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L160 338.7 393.4 105.4c12.5-12.5 32.8-12.5 45.3 0z"></path></svg><!-- <i class="fa-solid fa-check text-success" style="transform: rotate(0deg);"></i> Font Awesome fontawesome.com --></span></td><!--!-->
+                                            <td class="text-center">@email.Tanimi</td>
+                                            <td width="100%">@email.Eposta<br></td>
+                                            <td class="text-nowrap">
+                                                <button class="btn link-primary p-0 p-1" title="Düztenleme eposta"  type="button"><span><!--!--><span class="icon "><svg class="svg-inline--fa fa-pencil" style="transform: rotate(0deg);" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="pencil" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M410.3 231l11.3-11.3-33.9-33.9-62.1-62.1L291.7 89.8l-11.3 11.3-22.6 22.6L58.6 322.9c-10.4 10.4-18 23.3-22.2 37.4L1 480.7c-2.5 8.4-.2 17.5 6.1 23.7s15.3 8.5 23.7 6.1l120.3-35.4c14.1-4.2 27-11.8 37.4-22.2L387.7 253.7 410.3 231zM160 399.4l-9.1 22.7c-4 3.1-8.5 5.4-13.3 6.9L59.4 452l23-78.1c1.4-4.9 3.8-9.4 6.9-13.3l22.7-9.1v32c0 8.8 7.2 16 16 16h32zM362.7 18.7L348.3 33.2 325.7 55.8 314.3 67.1l33.9 33.9 62.1 62.1 33.9 33.9 11.3-11.3 22.6-22.6 14.5-14.5c25-25 25-65.5 0-90.5L453.3 18.7c-25-25-65.5-25-90.5 0zm-47.4 168l-144 144c-6.2 6.2-16.4 6.2-22.6 0s-6.2-16.4 0-22.6l144-144c6.2-6.2 16.4-6.2 22.6 0s6.2 16.4 0 22.6z"></path></svg><!-- <i class="fa-solid fa-pencil" style="transform: rotate(0deg);"></i> Font Awesome fontawesome.com --></span></span></button><!--!-->
+                                                <button class="btn link-danger p-0 p-1 ms-3" title="Silme eposta" @onclick="@(e => RemoveMail(email))" type="button"><span><!--!--><span class="icon "><svg class="svg-inline--fa fa-trash" style="transform: rotate(0deg);" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="trash" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z"></path></svg><!-- <i class="fa-solid fa-trash" style="transform: rotate(0deg);"></i> Font Awesome fontawesome.com --></span></span></button>
+                                            </td>
+                                        </tr>
+                                    }
+                                    if(isAddingMail)
+                                    {
+                                        <tr>
+                                            <td class="text-center"><!--!--><span class="icon p-1"><svg class="svg-inline--fa fa-check text-success" style="transform: rotate(0deg);" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="check" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M438.6 105.4c12.5 12.5 12.5 32.8 0 45.3l-256 256c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L160 338.7 393.4 105.4c12.5-12.5 32.8-12.5 45.3 0z"></path></svg><!-- <i class="fa-solid fa-check text-success" style="transform: rotate(0deg);"></i> Font Awesome fontawesome.com --></span></td>
+                                            <!-- Tanım inputu -->
+                                            <td width="85px" style="position: relative;">
+                                                <input placeholder="Ev, İş.." @bind="tanimi" maxlength="50" style="min-width: 100px;" class="form-control valid" _bl_26="">
+                                            </td>
+                                            <!-- Eposta inputu -->
+                                            <td style="position: relative;">
+                                                <input class="form-control @(!isEmailValid ? "is-invalid" : "")" type="email" @bind="eposta" placeholder="EPosta" maxlength="250">
+                                            </td>
+                                            <!-- Kaydet ve İptal Butonları -->
+                                            <td class="text-nowrap tel-btns" width="1%">
+                                                <!--!--><button class="btn link-primary p-0 p-1" title="kaydet" @onclick="ConfirmAddMail" type="button"><span><!--!--><span class="icon "><svg class="svg-inline--fa fa-check" style="transform: rotate(0deg);" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="check" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M438.6 105.4c12.5 12.5 12.5 32.8 0 45.3l-256 256c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L160 338.7 393.4 105.4c12.5-12.5 32.8-12.5 45.3 0z"></path></svg><!-- <i class="fa-solid fa-check" style="transform: rotate(0deg);"></i> Font Awesome fontawesome.com --></span></span></button><!--!-->
+                                                <!--!--><button class="btn link-danger p-0 p-1 ms-2" title="İptal et" @onclick="CancelAddMail" type="button"><span><!--!--><span class="icon "><svg class="svg-inline--fa fa-xmark" style="transform: rotate(0deg);" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="xmark" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" data-fa-i2svg=""><path fill="currentColor" d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"></path></svg><!-- <i class="fa-solid fa-xmark" style="transform: rotate(0deg);"></i> Font Awesome fontawesome.com --></span></span></button>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {<tr><td colspan="100" class="text-center fs-5 text-muted"><div>Epostalar yok!</div></td></tr>}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div>
+                    @* Adresler *@
+                    <div class="mb-1 d-flex align-items-center" style="justify-content: space-between;">
+                        <span class="fs-5">Adresler:</span>
+                        <button class="btn btn-success btn-sm" title="Yeni adres" @onclick="OpenAdresEkle" type="button"><span><!--!--><span class="icon "><i class="bi bi-plus-lg" style="transform: rotate(0deg);"></i> </span></span></button>
+                    </div>
+                    <div class="border overflow-auto mb-3" style="height: 149px;">
+                        <table class="table table-bordered table-hover mb-0 w-100 irt-table">
+                            @if (GetAdres.Any())
+                            {
+                                <tbody>
+                                    @foreach (var item in GetAdres)
+                                    {
+                                        <tr style="cursor: pointer">
+                                            <td>
+                                                <div class="fw-bold" @onclick="@(() => EditAddress(item))">
+                                                    @if (item.AdresBasligi == "Ev Adresi"){<i class="bi bi-house-door"></i>}
+                                                    else if (item.AdresBasligi == "İş Adresi"){<i class="bi bi-briefcase"></i>}
+                                                    else if (item.AdresBasligi == "Diğer"){<i class="bi bi-info-circle"></i>}
+                                                    @item.AdresBasligi
+                                                </div>
+                                                <div class="ps-2 text-muted">@item.AcikAdres</div>
+                                            </td>
+                                            <td class="text-end"><button class="btn btn-sm btn-outline-primary border-0"><i class="bi bi-x-lg"></i></button></td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            }
+                            else
+                            {
+                                <tbody>
+                                    <tr><td colspan="2" class="text-center fs-5 text-muted"><div>Adresler yok!</div></td></tr>
+                                </tbody>
+                            }
+                        </table></div></div></div></div></div>
+
+    <div class="d-flex" style="justify-content: flex-end;">
+        <button class="btn btn-outline-secondary w-25 me-auto" type="button" @onclick="Close"><span class=" ">İptal</span></button>
+        <button class="btn btn-primary w-25" type="submit"><span class=" ">Tamam</span></button>
+    </div>
+</form>
+
+
+
+@code {
+    // Address
+    [CascadingParameter] IModalService Modal { get; set; } = default!;
+    [CascadingParameter] BlazoredModalInstance BlazoredModal { get; set; } = default!;
+    private List<Address> GetAdres = new List<Address> { };
+    private bool isPerson = true; // Başlangıçta 'Şahıs' seçilmiş olarak ayarladım.
+
+    private void SelectType(bool isPersonSelected)
+    {
+        isPerson = isPersonSelected; // Seçime göre türü değiştirdim.
+    }
+
+    async Task OpenAdresEkle()
+    {
+        var modalRef = Modal.Show<YeniAdresEklePopUpComponent>(title: "Adres Ekleme", new ModalOptions { Position = ModalPosition.Middle, Size = ModalSize.Custom, SizeCustomClass = "my-size" });
+
+        var result = await modalRef.Result;
+        if (!result.Cancelled)
+        {
+            var newAddress = result.Data as Address;
+            if (newAddress != null)
+            {
+                GetAdres.Add(newAddress);
+                StateHasChanged();
+            }
+        }
+    }
+
+    async Task EditAddress(Address address)
+    {
+        var modalRef = Modal.Show<YeniAdresEklePopUpComponent>(title: "Adres Düzenleme",
+            new ModalParameters().Add("AddressToEdit", address),
+            new ModalOptions { Position = ModalPosition.Middle, Size = ModalSize.Custom, SizeCustomClass = "my-size" }
+        );
+
+        var result = await modalRef.Result;
+
+        if (!result.Cancelled)
+        {
+            var updatedAddress = result.Data as Address;
+            if (updatedAddress != null)
+            {
+                var index = GetAdres.FindIndex(a => a.AdresBasligi == address.AdresBasligi && a.AcikAdres == address.AcikAdres);
+                if (index != -1)
+                {
+                    GetAdres[index] = updatedAddress; // Güncellenmiş adres bilgilerini mevcut listeye ekle:))))))))))))
+                }
+                StateHasChanged();
+            }
+        }
+    }
+
+    private async Task Close()
+    {
+        await BlazoredModal.CloseAsync(ModalResult.Cancel());
+    } // Address
+
+
+    // Telefon
+    private List<Phone> Phones = new List<Phone>();
+    private bool isAddingNumber = false;
+    private string newPhoneType = "Cep"; // Default
+    private string newPhoneNumber;
+    private bool isDropdownOpen = false; // Dropdown açılıp  // Dropdown açılıp kapanma kontrolü
+    private bool isInvalid = true;
+    private string dahiliNumber;
+    private string newPhoneDescription;
+    private string selectedCountry = "+90";
+
+    string[] phoneType =
+    {
+        "Cep",
+        "Sabit",
+        "Diğer"
+    };
+
+    // Dropdown açılma/kapama
+    private void ToggleDropdown()
+    {
+        isDropdownOpen = !isDropdownOpen;
+        StateHasChanged();
+    }
+
+    // Telefon tipi seçimi
+    private void SelectPhoneType(string phoneType)
+    {
+        newPhoneType = phoneType;
+        isDropdownOpen = false; // Seçim yapıldıktan sonra dropdown kapanır
+        StateHasChanged();
+    }
+
+
+    // Var olan Telefonu sil
+    private void RemovePhone(Phone phone)
+    {
+        Phones.Remove(phone);
+        StateHasChanged();
+    }
+
+    private void OnPhoneNumberChanged(ChangeEventArgs e)
+    {
+        // Kullanıcıdan gelen değeri al
+        string input = e.Value.ToString();
+
+        //doğru sayı girene kadar uyarı ver doğru sayı girerse geçerli
+        if (input.Length >= 10)
+            isInvalid = false;
+        else
+            isInvalid = true;
+
+        // Sayıları filtrele
+        var digits = new string(input.Where(char.IsDigit).ToArray());
+
+        // Formatı uygula
+        if (digits.Length > 10)
+            digits = digits.Substring(0, 10);
+
+        newPhoneNumber = FormatPhoneNumber(digits);
+    }
+
+    private string FormatPhoneNumber(string number)
+    {
+        if (number.Length == 0)
+            return "";
+
+        if (number.Length < 4)
+            return $"({number})";
+
+        if (number.Length < 7)
+            return $"({number.Substring(0, 3)}) {number.Substring(3)}";
+
+        return $"({number.Substring(0, 3)}) {number.Substring(3, 3)} {number.Substring(6)}";
+    }
+
+    private List<Country> countries = new List<Country>
+    {
+        new Country { ulkeName = "Türkiye", Code = "90" },
+        new Country { ulkeName = "Afganistan", Code = "93" },
+        new Country { ulkeName = "Arnavutluk", Code = "355" },
+        new Country { ulkeName= "Cezayir", Code = "213" },
+        new Country { ulkeName= "Andora", Code = "376" },
+        new Country { ulkeName = "Angola", Code = "244" },
+        new Country { ulkeName = "Antigua ve Barbuda", Code = "1 268" },
+        new Country { ulkeName = "Arjantin", Code = "54" },
+        new Country { ulkeName = "Ermenistan", Code = "374" },
+        new Country { ulkeName = "Avustralya", Code = "61" },
+        // Daha fazla ülke eklenebilir
+    };
+
+    private void SelectCountry(Country country) => selectedCountry = $"+{country.Code}";
+
+    // Yeni telefon ekleme işlemi tetikleyici
+    private void AddNewPhone()
+    {
+        ResetPhoneForm();
+        isAddingNumber = true;
+        StateHasChanged();
+    }
+
+    // Telefon numarasını kaydet
+    private void ConfirmAddPhone()
+    {
+        if (!string.IsNullOrEmpty(newPhoneNumber) && newPhoneNumber.Length == 14)
+        {
+            Phones.Add(new Phone
+                {
+                    Type = newPhoneType,
+                    Code = selectedCountry,
+                    Number = newPhoneNumber,
+                    Dahili = dahiliNumber,
+                    Tanimi = newPhoneDescription
+                });
+
+            ResetPhoneForm();
+        }
+        else
+        {
+            isInvalid = true;
+            Console.WriteLine("Lütfen geçerli bir telefon numarası girin (tam 10 basamak)");
+        }
+        StateHasChanged();
+    }
+
+    // Ekleme işlemini iptal et
+    private void CancelAddPhone()
+    {
+        ResetPhoneForm();
+        StateHasChanged();
+    }
+
+    private void ResetPhoneForm()
+    {
+        isAddingNumber = false;
+        newPhoneType = "Cep";
+        newPhoneNumber = string.Empty;
+        dahiliNumber = string.Empty;
+        newPhoneDescription = string.Empty;
+        selectedCountry = "+90";
+        isDropdownOpen = false;
+        isInvalid = true;
+    }
+    // Telefon
+
+    //Mail
+    private List<Email> Emails = new List<Email>();
+    private string tanimi;
+    private string eposta;
+    private bool isAddingMail=false;
+    private bool isEmailValid = true;
+    private bool isEditing = false;
+
+    private void ResetMailForm()
+    {
+        tanimi = string.Empty;
+        eposta = string.Empty;
+        isAddingMail = false;
+        isEmailValid = true;
+        isEditing = false;
+    }
+
+    // Yeni telefon ekleme işlemi tetikleyici
+    private void AddNewMail()
+    {
+        ResetMailForm();
+        isAddingMail = true;
+        StateHasChanged();
+    }
+    // Mail kaydet
+    private void ConfirmAddMail()
+    {
+        var emailPattern = @"^[^@\s]+@[^@\s]+\.[^@\s]+$";
+        isEmailValid = System.Text.RegularExpressions.Regex.IsMatch(eposta, emailPattern);
+
+        if (!isEmailValid)
+            return;
+
+        Emails.Add(new Email { Tanimi = tanimi, Eposta = eposta });
+        ResetMailForm();
+        StateHasChanged();
+    }
+    // Ekleme işlemini iptal et
+    private void CancelAddMail()
+    {
+        ResetMailForm();
+        StateHasChanged();
+    }
+    // Var olan Mail sil
+    private void RemoveMail(Email email)
+    {
+        Emails.Remove(email);
+        StateHasChanged();
+    }
+}

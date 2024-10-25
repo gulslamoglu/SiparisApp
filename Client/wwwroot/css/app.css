@@ -2,6 +2,7 @@
 
 html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 0.9em!important;
 }
 
 h1:focus {
@@ -99,3 +100,52 @@ a, .btn-link {
     .loading-progress-text:after {
         content: var(--blazor-load-percentage-text, "Loading");
     }
+
+
+/*MODAL*/
+.blazored-modal[b-mwsrhhqq2g] {
+    padding: 0.5rem !important;
+    box-shadow: 5px 5px 5px rgba(0, 0, 0, .25) !important;
+    border: 1px solid #ddd !important;
+    border-radius: 5px !important;
+}
+
+.bm-container[b-mwsrhhqq2g] {
+    padding: 10px;
+    background-color: rgba(255, 255, 255, 0.5) !important;
+}
+
+.bm-header[b-mwsrhhqq2g] {
+    padding: 1rem 0 1rem 0 !important;
+}
+
+.bm-title[b-mwsrhhqq2g] {
+    font-weight: 500 !important;
+    color: gray !important;
+}
+
+.overflow-auto::-webkit-scrollbar {
+    width: 0.3em !important;
+    height: 0.3em !important;
+}
+
+.overflow-auto::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3) !important;
+}
+
+.overflow-auto::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2) !important;
+    outline: 1px solid rgba(0, 0, 0, 0.2) !important;
+}
+/* Butonlar ve input'lar focus olduðunda etrafýndaki mavi çerçeveyi kaldýr */
+button:focus, input:focus, select:focus, textarea:focus {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+.blazored-modal.my-size {
+    margin: auto;
+    width: 650px !important;
+}
+
+/*MODAL*/

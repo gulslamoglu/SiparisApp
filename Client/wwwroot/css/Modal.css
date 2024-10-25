@@ -1,0 +1,39 @@
+.blazored-modal {
+    padding: 0.5rem !important;
+    box-shadow: 5px 5px 5px rgba(0, 0, 0, .25) !important;
+    border: 1px solid #ddd !important;
+    border-radius: 5px !important;
+}
+
+.bm-container {
+    padding: 10px;
+    background-color: rgba(255, 255, 255, 0.5) !important;
+}
+
+.bm-header {
+    padding: 1rem 0 1rem 0 !important;
+}
+
+.bm-title {
+    font-weight: 500 !important;
+    color: gray !important;
+}
+
+.overflow-auto::-webkit-scrollbar {
+    width: 0.3em !important;
+    height: 0.3em !important;
+}
+
+.overflow-auto::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3) !important;
+}
+
+.overflow-auto::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2) !important;
+    outline: 1px solid rgba(0, 0, 0, 0.2) !important;
+}
+/* Butonlar ve input'lar focus olduðunda etrafýndaki mavi çerçeveyi kaldýr */
+button:focus, input:focus, select:focus, textarea:focus {
+    outline: none !important;
+    box-shadow: none !important;
+}

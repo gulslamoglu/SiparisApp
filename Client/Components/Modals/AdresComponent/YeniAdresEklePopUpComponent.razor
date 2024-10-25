@@ -1,5 +1,4 @@
-﻿
-<EditForm Model="newAddress" OnValidSubmit="HandleValidSubmit" class="needs-validation" novalidate>
+﻿<EditForm Model="newAddress" OnValidSubmit="HandleValidSubmit" class="needs-validation" novalidate>
     <DataAnnotationsValidator />
 
     <div class="p-4 border border-1 mb-4" style="border-radius:10px">
@@ -130,10 +129,7 @@
     <!-- Kaydet Butonu -->
     <div class="row">
         <div class="col text-start">
-            <button type="button" class="btn btn-sm btn-outline-secondary w-25" > İptal</button>
-        </div>
-        <div class="col text-center">
-            <button type="button" class="btn btn-sm btn-outline-secondary w-25">Sil </button>
+            <button type="button" class="btn btn-sm btn-outline-secondary w-25" @onclick="Close" > İptal</button>
         </div>
         <div class="col text-end">
             <button type="submit" class="btn btn-sm btn-primary w-50"> Tamam</button>
@@ -149,23 +145,10 @@
         background-color: #e9ecef; 
         color: #495057; 
     }
-
-    .blazored-modal.my-size {
-       max-width: 700px;
-       margin: auto;
-    }
-    
-    .bm-header{
-        padding: 1rem 0 0 0!important;
-    }
-    .bm-title{
-        font-size:x-large;
-    }
-
-    </style>
+</style>
 
 @code {
-
+    [CascadingParameter] BlazoredModalInstance BlazoredModal { get; set; } = default!;
     [Parameter] public Address AddressToEdit { get; set; }
     private Address newAddress = new Address();
     private List<Address> addresses = new List<Address>();
@@ -338,12 +321,16 @@
         return selectedIlce?.Mahalleler ?? new List<Mahalle>();
     }
 
-
-    [CascadingParameter] BlazoredModalInstance BlazoredModal { get; set; } = default!;
     private async Task HandleValidSubmit()
     {
         addresses.Add(newAddress);
         await BlazoredModal.CloseAsync(ModalResult.Ok(newAddress));
+        
+    }
+
+    private async Task Close()
+    {
+        await BlazoredModal.CloseAsync(ModalResult.Cancel());
     }
 }
 

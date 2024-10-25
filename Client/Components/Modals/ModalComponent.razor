@@ -1,6 +1,4 @@
-﻿@page "/products"
-
-
+﻿
 <!-- Dropdown for Ürün Grubu -->
 <div class="row mb-1 small">
     <div class="col-4">
@@ -53,6 +51,7 @@
         <span class="visually-hidden">Aranıyor</span>
     </div>
     <span class="btg-dd-status-text text-muted small fst-italic">@FilteredProducts.Count() adet ürün listeleniyor.</span>
+    <a class="btn-link btg-btn-cancel  float-end" href="javascript:;" @onclick="Close"><i class="bi bi-x"></i></a>
 </div>
 
 
@@ -64,6 +63,7 @@
 
 
 @code {
+    [CascadingParameter] BlazoredModalInstance BlazoredModal { get; set; } = default!;
     protected override void OnInitialized() => Fill();
 
     public void Fill()
@@ -95,4 +95,9 @@
     private List<Product> FilteredProducts { get; set; } = [];
 
     private void FilterProductsList() => Fill();
+
+    private async Task Close()
+    {
+        await BlazoredModal.CloseAsync(ModalResult.Cancel());
+    }
 }

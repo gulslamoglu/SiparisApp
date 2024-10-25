@@ -39,7 +39,7 @@
                         </div>
                     </td>
                     <td class="text-end">
-                        <button class="btn btn-sm btn-outline-danger" @onclick="@(e => DeleteAddress(item))"><i class="bi bi-x-lg"></i></button>
+                        <button class="btn btn-sm btn-outline-primary border-0" @onclick="@(e =>DeleteAddress(item))"><i class="bi bi-x-lg"></i></button>
                     </td>
                 </tr>
             }
@@ -51,18 +51,14 @@
 @* Adres Adeti *@
 <div class="p-2 " style=" height: 40px;">
     <span class="btg-dd-status-text text-muted small fst-italic">@GetAdres.Count() adet Adres listeleniyor.</span>
-    <a class="btn-link btg-btn-cancel  float-end" href="javascript:;"><i class="bi bi-x"></i></a>
+    <a class="btn-link btg-btn-cancel  float-end" href="javascript:;" @onclick="Close"><i class="bi bi-x"></i></a>
 </div>@* Adres Adeti *@
 
 
-<style>
-    .blazored-modal{
-        padding: 0.5rem!important;
-    }
-
-</style>
 
 @code {
+    [CascadingParameter] BlazoredModalInstance BlazoredModal { get; set; } = default!;
+    [CascadingParameter] IModalService modalService { get; set; } = default!;
     private List<Address> GetAdres = new List<Address>
     {
         new Address {AdresBasligi = "Ev Adresi", AcikAdres= "SAHİL MAH Kaptanı Derya Sk. No: 9 K.1 D: 2034524 BEYLİKDÜZÜ / İSTANBUL"},
@@ -70,9 +66,6 @@
         new Address {AdresBasligi = "İş Adresi", AcikAdres = "EMİNAÇMA KÖYÜ No: 80 (Caminin Arkası)81100 MERKEZ / DÜZCE"},
 
     };
-
-    [CascadingParameter] IModalService modalService { get; set; } = default;
-
 
     async Task AddNewAdress()
     {
@@ -122,5 +115,10 @@
             GetAdres.Remove(address);
             StateHasChanged();
         }
+    }
+
+    private async Task Close()
+    {
+        await BlazoredModal.CloseAsync(ModalResult.Cancel());
     }
 }

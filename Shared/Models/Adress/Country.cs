@@ -9,5 +9,6 @@ namespace SiparisApp.Shared.Models.Adress
     public class Country
     {
         public string ulkeName { get; set; }
+        public string Code { get; set; }
     }
 }

@@ -99,8 +99,8 @@
     </div>
 
     <div class="m-2 text-end">
-        <button type="button"  class="btn btn-sm btn-secondary" ><i class="bi bi-x"></i> İptal</button>
-        <button type="button"  class="btn btn-sm btn-primary"><i class="bi bi-check-lg"></i> Tamam</button>
+        <button type="button"  class="btn btn-sm btn-secondary" @onclick="Close" ><i class="bi bi-x"></i> İptal</button>
+        <button type="submit"  class="btn btn-sm btn-primary" @onclick="SubmitSonuc"><i class="bi bi-check-lg"></i> Tamam</button>
     </div>
 </div>
 
@@ -111,6 +111,7 @@
 </style>
 
 @code {
+    [CascadingParameter] BlazoredModalInstance BlazoredModal { get; set; } = default!;
     private string selectedType = "İskonto"; // Varsayılan değer iskonto olsun-opsiyonel
     private decimal SatisTutari = 14000.00M;
     private List<IskontoMasraf> IskontoMasrafList = new List<IskontoMasraf>
@@ -118,6 +119,7 @@
         new IskontoMasraf { Turu = "İskonto", Hesaplama = "Oran", Miktar = 5.00M, Hesaplanan = -700.00M },
         new IskontoMasraf { Turu = "Masraf", Hesaplama = "Tutar", Miktar = 400.00M, Hesaplanan = 400.00M }
     }; // Başlangıçta listeye birkaç nesne ekleyelim
+
 
     private decimal ToplamIskontoMasraf => IskontoMasrafList.Sum(x => x.Hesaplanan);
     private decimal SonucTutari => SatisTutari + ToplamIskontoMasraf;
@@ -183,5 +185,15 @@
     {
         IskontoMasrafList.Add(new IskontoMasraf { Turu = selectedType, Miktar = 0, Hesaplama = "Oran" });
         UpdateToplam();
+    }
+
+    private async Task SubmitSonuc()
+{
+    await BlazoredModal.CloseAsync(ModalResult.Ok(SonucTutari));
+}
+
+    private async Task Close()
+    {
+        await BlazoredModal.CloseAsync(ModalResult.Cancel());
     }
 }

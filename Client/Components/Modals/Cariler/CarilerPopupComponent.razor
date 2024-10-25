@@ -1,4 +1,5 @@
-﻿@using System.Globalization
+﻿
+
 @* Cari seçimi *@ 
 <div class="p-1">
     <div class="small btg-table-caption">Cari seçimi</div>
@@ -66,7 +67,7 @@
     </div>
     @* yeni cari ekle butonu *@
     <div class="my-1 text-end">
-        <button class="btn btn-sm btn-outline-primary small"> <i class="bi bi-plus-lg"></i> Yeni Cari Ekle</button>
+        <button class="btn btn-sm btn-outline-primary small" @onclick="OpenModal"> <i class="bi bi-plus-lg"></i> Yeni Cari Ekle</button>
     </div>
     @* Cariler Tablosu *@
     <div class="p-2 border border-1" style="height: 200px; max-width: 100%; overflow: auto">
@@ -78,6 +79,7 @@
                         <td nowrap=""><i class="bi bi-person"></i>@item.Id</td>
                         <td nowrap="">@item.Ad</td>
                         <td nowrap="">@item.Telefon</td>
+                        <td nowrap="">@item.Eposta</td>
                         <td nowrap="">@adres.FirstOrDefault(a => a.Id == item.AdresId)?.AcikAdres</td>
 
                     </tr>
@@ -91,26 +93,24 @@
             <span class="visually-hidden">Aranıyor</span>
         </div>
         <span class="btg-dd-status-text text-muted small fst-italic">@FilteredCariler.Count() adet cari listeleniyor.</span>
-        <a class="btn-link btg-btn-cancel  float-end" href="javascript:;"><i class="bi bi-x"></i></a>
+        <a class="btn-link btg-btn-cancel  float-end" href="javascript:;" @onclick="Close"><i class="bi bi-x"></i></a>
     </div>
 
 </div>
 
-<style>
-    .blazored-modal{
-        padding: 0.5rem!important;
-    }
-</style>
+
 
 @code {
+    [CascadingParameter] BlazoredModalInstance BlazoredModal { get; set; } = default!;
+    [CascadingParameter] IModalService ModalService { get; set; } = default!;
+
     private List<Cari> Cariler = new List<Cari>
     {
-        new Cari {Id = 14839, Ad= "BURHAN GÜLER" , Telefon= "(505) 689 19 85", AdresId= 1},
-        new Cari {Id = 14840, Ad= "İHLAS PAZARLAMA A.Ş" , Telefon= "(212) 444 49 49", AdresId= 2},
-        new Cari {Id = 14841, Ad= "MUHAMMED CİNDİOĞLU" , Telefon= "(505) 689 19 85", AdresId= 3},
-        new Cari {Id = 14842, Ad= "TGSOFT YAZILIM VE DANIŞMALLIK LTD. ŞTİ." , Telefon= "(545) 877 08 43",AdresId= 1}
+        new Cari {Id = 14839, Ad= "BURHAN GÜLER" , Telefon= "(505) 689 19 85",Eposta="burhan.guler@ipa.com.tr" ,AdresId= 1},
+        new Cari {Id = 14840, Ad= "İHLAS PAZARLAMA A.Ş" , Telefon= "(212) 444 49 49",Eposta="ihlas.pazarlama@ipa.com.tr", AdresId= 2},
+        new Cari {Id = 14841, Ad= "MUHAMMED CİNDİOĞLU" , Telefon= "(505) 689 19 85",Eposta="muhammed.cindioglu@ipa.com.tr", AdresId= 3},
+        new Cari {Id = 14842, Ad= "TGSOFT YAZILIM VE DANIŞMALLIK LTD. ŞTİ." , Telefon= "(545) 877 08 43",Eposta="tgsoft@ipa.com.tr",AdresId= 1}
     };
-
 
     private List<Country> Ulke = new List<Country>
     {
@@ -205,8 +205,8 @@
         new Address {Id=3,Country= "Türkiye", City="İstanbul", District="Başakşehir", Neighborhood="Kayaşehir Mahallesi",AcikAdres= "KAYAŞEHİR MAH - BAŞAKŞEHİR / İSTANBUL" },
 
     };
-    
-    
+
+
 
     private List<Cari> FilteredCariler = new List<Cari>();
     private string searchType = "Ad";
@@ -218,7 +218,7 @@
 
     private void ApplyFilters()
     {
-        string searchTermLower = searchTerm.ToLower(new CultureInfo("tr-TR"));
+        string searchTermLower = searchTerm.ToLower();
 
         FilteredCariler = Cariler.Where(c =>
         (string.IsNullOrEmpty(filteraddress.Country) ||
@@ -260,4 +260,17 @@
         return ilce?.Mahalleler ?? new List<Mahalle>();
     }
 
+
+    private async Task Close()
+    {
+        await BlazoredModal.CloseAsync(ModalResult.Cancel());
+    }
+
+
+     async Task OpenModal()
+    {
+        var modalRef = ModalService.Show<YeniCariEklePopUpComponent>(title: "Yeni Cari",
+            new ModalOptions {Size= ModalSize.Large, DisableBackgroundCancel=true });
+        var modalRes = modalRef.Result;
+    }
 }
