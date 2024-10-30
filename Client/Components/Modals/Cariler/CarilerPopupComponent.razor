@@ -77,7 +77,7 @@
                 {
                     <tr style="cursor: pointer" onclick="btg_Siparis_Cari_sec(this);">
                         <td nowrap=""><i class="bi bi-person"></i>@item.Id</td>
-                        <td nowrap="">@item.Ad</td>
+                        <td nowrap="">@item.Ad @item.Soyad</td>
                         <td nowrap="">@item.Telefon</td>
                         <td nowrap="">@item.Eposta</td>
                         <td nowrap="">@adres.FirstOrDefault(a => a.Id == item.AdresId)?.AcikAdres</td>
@@ -102,14 +102,15 @@
 
 @code {
     [CascadingParameter] BlazoredModalInstance BlazoredModal { get; set; } = default!;
+
     [CascadingParameter] IModalService ModalService { get; set; } = default!;
 
-    private List<Cari> Cariler = new List<Cari>
+    private List<CariModel> Cariler = new List<CariModel>
     {
-        new Cari {Id = 14839, Ad= "BURHAN GÜLER" , Telefon= "(505) 689 19 85",Eposta="burhan.guler@ipa.com.tr" ,AdresId= 1},
-        new Cari {Id = 14840, Ad= "İHLAS PAZARLAMA A.Ş" , Telefon= "(212) 444 49 49",Eposta="ihlas.pazarlama@ipa.com.tr", AdresId= 2},
-        new Cari {Id = 14841, Ad= "MUHAMMED CİNDİOĞLU" , Telefon= "(505) 689 19 85",Eposta="muhammed.cindioglu@ipa.com.tr", AdresId= 3},
-        new Cari {Id = 14842, Ad= "TGSOFT YAZILIM VE DANIŞMALLIK LTD. ŞTİ." , Telefon= "(545) 877 08 43",Eposta="tgsoft@ipa.com.tr",AdresId= 1}
+        new CariModel {Id = Guid.NewGuid(), Ad= "BURHAN",Soyad="GÜLER" , Telefon= "(505) 689 19 85",Eposta="burhan.guler@ipa.com.tr" ,AdresId=1 },
+        new CariModel {Id = Guid.NewGuid(), Ad= "İHLAS PAZARLAMA A.Ş" ,Soyad="" , Telefon= "(212) 444 49 49",Eposta="ihlas.pazarlama@ipa.com.tr", AdresId= 2},
+        new CariModel {Id = Guid.NewGuid(), Ad= "MUHAMMED" ,Soyad="CİNDİOĞLU" , Telefon= "(505) 689 19 85",Eposta="muhammed.cindioglu@ipa.com.tr", AdresId= 2},
+        new CariModel {Id = Guid.NewGuid(), Ad= "TGSOFT YAZILIM VE DANIŞMALLIK LTD. ŞTİ." ,Soyad="" , Telefon= "(545) 877 08 43",Eposta="tgsoft@ipa.com.tr",AdresId= 3}
     };
 
     private List<Country> Ulke = new List<Country>
@@ -205,16 +206,11 @@
         new Address {Id=3,Country= "Türkiye", City="İstanbul", District="Başakşehir", Neighborhood="Kayaşehir Mahallesi",AcikAdres= "KAYAŞEHİR MAH - BAŞAKŞEHİR / İSTANBUL" },
 
     };
-
-
-
-    private List<Cari> FilteredCariler = new List<Cari>();
+    private List<CariModel> FilteredCariler = new List<CariModel>();
     private string searchType = "Ad";
     private string searchTerm = "";
 
-
     protected override void OnInitialized() => ApplyFilters();
-
 
     private void ApplyFilters()
     {
@@ -240,14 +236,10 @@
         ).ToList();
     }
 
-
-
     private string NormalizePhoneNumber(string phoneNumber)
     {
         return new string(phoneNumber.Where(char.IsDigit).ToArray());
     }
-
-
     private List<Ilce> GetDistricts(string selectedCity)
     {
         var il = Iller.FirstOrDefault(i => i.IlName == selectedCity);
@@ -267,10 +259,21 @@
     }
 
 
-     async Task OpenModal()
+    async Task OpenModal()
     {
-        var modalRef = ModalService.Show<YeniCariEklePopUpComponent>(title: "Yeni Cari",
-            new ModalOptions {Size= ModalSize.Large, DisableBackgroundCancel=true });
-        var modalRes = modalRef.Result;
+        var modalOptions = new ModalOptions(){Size = ModalSize.Large,DisableBackgroundCancel = true};
+
+        var modalRef = ModalService.Show<YeniCariEklePopUpComponent>(title: "Yeni Cari", modalOptions);
+        var result = await modalRef.Result;
+        if (!result.Cancelled)
+        {
+            var yeniCari = result.Data as CariModel;
+            if (yeniCari != null)
+            {
+                Cariler.Add(yeniCari);
+                StateHasChanged();
+                ApplyFilters();
+            }
+        }
     }
 }

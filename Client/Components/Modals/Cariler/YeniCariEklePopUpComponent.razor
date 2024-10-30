@@ -1,4 +1,4 @@
-﻿<form>
+﻿<form @onsubmit="SaveCari">
     <ul class="nav nav-tabs" style="margin: 0 5px;"><li class="nav-item ms-2 "><button class="nav-link py-1 active bg-light" type="button">Genel belgileri</button></li></ul><div class="ipacard card bg-light overflow-hidden mb-3 border-top-0" style="height:calc(100vh - 215px)">
         <div class="overflow-auto" style="height:calc(100vh - 215px)">
             <div class="card-body ">
@@ -56,11 +56,11 @@
                 </div><div class="row mb-2">
                     <div class="col-12 col-sm-6 pe-0">
                         <label class="form-label"> @(isPerson ? "Adı" : "Yetki Adı")</label>
-                        <input type="text" class="form-control auto-focus" maxlength="50">
+                        <input type="text" @bind="newCari.Ad" class="form-control auto-focus" maxlength="50">
                     </div>
                     <div class="col-12 col-sm-6">
                         <label class="form-label">@(isPerson ? "Soyadı" : "Yetki Soyadı")</label>
-                        <input type="text" class="form-control" maxlength="50">
+                        <input type="text" @bind="newCari.Soyad" class="form-control" maxlength="50">
                     </div>
                     @* Tip *@
                 </div><div class="row mb-3">
@@ -87,7 +87,7 @@
                     @* TC *@
                     <div class="col-12 col-sm-6">
                         <label class="form-label">@(isPerson ? "TC Kimlik No" : "Vergi No")</label>
-                        <input type="text" class="form-control" maxlength="11">
+                        <input type="text" @bind="newCari.TC" class="form-control" maxlength="11">
                     </div>
                 </div>
                 <div>
@@ -115,18 +115,67 @@
                                 {
                                     @foreach (var phone in Phones)
                                     {
-                                        <tr>
-                                            <td class="text-center"><!--!--><span class="icon p-1"><svg class="svg-inline--fa fa-check text-success" style="transform: rotate(0deg);" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="check" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M438.6 105.4c12.5 12.5 12.5 32.8 0 45.3l-256 256c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L160 338.7 393.4 105.4c12.5-12.5 32.8-12.5 45.3 0z"></path></svg><!-- <i class="fa-solid fa-check text-success" style="transform: rotate(0deg);"></i> Font Awesome fontawesome.com --></span></td>
-                                            <td class="text-center">@phone.Type</td>
-                                            <td class="text-center">@(!string.IsNullOrWhiteSpace(@phone.Tanimi) ? $"{@phone.Tanimi}" : "Belirtilmedi")</td>
-                                            <td>@phone.Code @phone.Number@(!string.IsNullOrWhiteSpace(@phone.Dahili) ? $"-{@phone.Dahili}" : "")</td>
-                                            <td class="text-nowrap" width="1%">
-                                                <!--!--><button class="btn link-primary p-0 p-1" title="Düztenleme telefon" type="button"><span><!--!--><span class="icon "><svg class="svg-inline--fa fa-pencil" style="transform: rotate(0deg);" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="pencil" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M410.3 231l11.3-11.3-33.9-33.9-62.1-62.1L291.7 89.8l-11.3 11.3-22.6 22.6L58.6 322.9c-10.4 10.4-18 23.3-22.2 37.4L1 480.7c-2.5 8.4-.2 17.5 6.1 23.7s15.3 8.5 23.7 6.1l120.3-35.4c14.1-4.2 27-11.8 37.4-22.2L387.7 253.7 410.3 231zM160 399.4l-9.1 22.7c-4 3.1-8.5 5.4-13.3 6.9L59.4 452l23-78.1c1.4-4.9 3.8-9.4 6.9-13.3l22.7-9.1v32c0 8.8 7.2 16 16 16h32zM362.7 18.7L348.3 33.2 325.7 55.8 314.3 67.1l33.9 33.9 62.1 62.1 33.9 33.9 11.3-11.3 22.6-22.6 14.5-14.5c25-25 25-65.5 0-90.5L453.3 18.7c-25-25-65.5-25-90.5 0zm-47.4 168l-144 144c-6.2 6.2-16.4 6.2-22.6 0s-6.2-16.4 0-22.6l144-144c6.2-6.2 16.4-6.2 22.6 0s6.2 16.4 0 22.6z"></path></svg><!-- <i class="fa-solid fa-pencil" style="transform: rotate(0deg);"></i> Font Awesome fontawesome.com --></span></span></button><!--!-->
-                                                <!--!--><button class="btn link-danger p-0 p-1 ms-3" title="Silme telefon" @onclick="@(e => RemovePhone(phone))" type="button"><span><!--!--><span class="icon "><svg class="svg-inline--fa fa-trash" style="transform: rotate(0deg);" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="trash" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z"></path></svg><!-- <i class="fa-solid fa-trash" style="transform: rotate(0deg);"></i> Font Awesome fontawesome.com --></span></span></button>
-                                            </td>
-                                        </tr>
+                                        @if (editingPhoneId == phone.Number)
+                                        {
+                                            <tr>
+                                                <td class="text-center">
+                                                    <span class="icon p-1"><i class="fas fa-check text-success"></i></span>
+                                                </td>
+                                                <td width="85px">
+                                                    <div class="dropdown">
+                                                        <button class="btn btn-outline-secondary dropdown-toggle"
+                                                                type="button"
+                                                                @onclick="ToggleDropdown">
+                                                            @editingPhone.Type
+                                                        </button>
+                                                        @if (isDropdownOpen)
+                                                        {
+                                                            <ul class="dropdown-menu show">
+                                                                @foreach (var type in phoneType)
+                                                                {
+                                                                    <li><button class="dropdown-item" @onclick="() => { editingPhone.Type = type; isDropdownOpen = false; }">@type</button></li>
+                                                                }
+                                                            </ul>
+                                                        }
+                                                    </div>
+                                                </td>
+                                                <td width="85px" style="position: relative;">
+                                                    <input @bind="editingPhone.Tanimi" placeholder="Babam.." maxlength="50" style="min-width: 100px;" class="form-control text-success valid" _bl_31="">
+                                                </td>
+                                              
+                                                <td>
+                                                    <div class="input-group">
+                                                        <input class="form-control @(!isInvalid && newPhoneNumber.Length == 14 ? "is-valid" : (isInvalid ? "is-invalid" : ""))"
+                                                               @oninput="OnPhoneNumberChanged"
+                                                               value="@editingPhone.Number"
+                                                               placeholder="(___) ___ __ __"
+                                                               maxlength="14" />
+                                                        <input @bind="editingPhone.Dahili" placeholder="Dahili" class="form-control" maxlength="5" style="max-width: 65px;" />
+                                                    </div>
+                                                </td>
+                                                <td class="text-nowrap tel-btns" width="1%">
+                                                    <button class="btn link-primary p-0 p-1" @onclick="SaveEditPhone"><i class="fas fa-check"></i></button>
+                                                    <button class="btn link-danger p-0 p-1 ms-2" @onclick="CancelEditPhone"><i class="fas fa-xmark"></i></button>
+                                                </td>
+                                            </tr>
+                                        }
+                                        else
+                                        {
+                                            <tr>
+                                                <td class="text-center">
+                                                    <span class="icon p-1"><i class="fas fa-check text-success"></i></span>
+                                                </td>
+                                                <td class="text-center">@phone.Type</td>
+                                                <td class="text-center">@phone.Tanimi</td>
+                                                <td>@phone.Code @phone.Number@(!string.IsNullOrWhiteSpace(phone.Dahili) ? $"-{phone.Dahili}" : "")</td>
+                                                <td class="text-nowrap tel-btns" width="1%">
+                                                    <button class="btn link-primary p-0 p-1" type="button"  @onclick="() => StartEditPhone(phone)"><i class="fas fa-pencil"></i></button>
+                                                    <button class="btn link-danger p-0 p-1 ms-3" type="button" @onclick="@(e => RemovePhone(phone))"><i class="fas fa-trash"></i></button>
+                                                </td>
+                                            </tr>
+                                        }
                                     }
-                                    if (isAddingNumber)
+                                    @if (isAddingNumber)
                                     {
                                         <tr>
                                             <td class="text-center"><!--!--><span class="icon p-1"><svg class="svg-inline--fa fa-check text-success" style="transform: rotate(0deg);" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="check" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M438.6 105.4c12.5 12.5 12.5 32.8 0 45.3l-256 256c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L160 338.7 393.4 105.4c12.5-12.5 32.8-12.5 45.3 0z"></path></svg><!-- <i class="fa-solid fa-check text-success" style="transform: rotate(0deg);"></i> Font Awesome fontawesome.com --></span></td>
@@ -185,7 +234,6 @@
                                                 </div>
                                             </td>
 
-
                                             <!-- Kaydet ve İptal Butonları -->
                                             <td class="text-nowrap tel-btns" width="1%">
                                                 <!--!--><button class="btn link-primary p-0 p-1" title="kaydet" @onclick="ConfirmAddPhone" type="button"><span><!--!--><span class="icon "><svg class="svg-inline--fa fa-check" style="transform: rotate(0deg);" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="check" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M438.6 105.4c12.5 12.5 12.5 32.8 0 45.3l-256 256c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L160 338.7 393.4 105.4c12.5-12.5 32.8-12.5 45.3 0z"></path></svg><!-- <i class="fa-solid fa-check" style="transform: rotate(0deg);"></i> Font Awesome fontawesome.com --></span></span></button><!--!-->
@@ -222,32 +270,56 @@
                                 {
                                     @foreach (var email in Emails)
                                     {
-                                        <tr>
-                                            <td class="text-center"><span class="icon p-1"><svg class="svg-inline--fa fa-check text-success" style="transform: rotate(0deg);" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="check" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M438.6 105.4c12.5 12.5 12.5 32.8 0 45.3l-256 256c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L160 338.7 393.4 105.4c12.5-12.5 32.8-12.5 45.3 0z"></path></svg><!-- <i class="fa-solid fa-check text-success" style="transform: rotate(0deg);"></i> Font Awesome fontawesome.com --></span></td><!--!-->
-                                            <td class="text-center">@email.Tanimi</td>
-                                            <td width="100%">@email.Eposta<br></td>
-                                            <td class="text-nowrap">
-                                                <button class="btn link-primary p-0 p-1" title="Düztenleme eposta"  type="button"><span><!--!--><span class="icon "><svg class="svg-inline--fa fa-pencil" style="transform: rotate(0deg);" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="pencil" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M410.3 231l11.3-11.3-33.9-33.9-62.1-62.1L291.7 89.8l-11.3 11.3-22.6 22.6L58.6 322.9c-10.4 10.4-18 23.3-22.2 37.4L1 480.7c-2.5 8.4-.2 17.5 6.1 23.7s15.3 8.5 23.7 6.1l120.3-35.4c14.1-4.2 27-11.8 37.4-22.2L387.7 253.7 410.3 231zM160 399.4l-9.1 22.7c-4 3.1-8.5 5.4-13.3 6.9L59.4 452l23-78.1c1.4-4.9 3.8-9.4 6.9-13.3l22.7-9.1v32c0 8.8 7.2 16 16 16h32zM362.7 18.7L348.3 33.2 325.7 55.8 314.3 67.1l33.9 33.9 62.1 62.1 33.9 33.9 11.3-11.3 22.6-22.6 14.5-14.5c25-25 25-65.5 0-90.5L453.3 18.7c-25-25-65.5-25-90.5 0zm-47.4 168l-144 144c-6.2 6.2-16.4 6.2-22.6 0s-6.2-16.4 0-22.6l144-144c6.2-6.2 16.4-6.2 22.6 0s6.2 16.4 0 22.6z"></path></svg><!-- <i class="fa-solid fa-pencil" style="transform: rotate(0deg);"></i> Font Awesome fontawesome.com --></span></span></button><!--!-->
-                                                <button class="btn link-danger p-0 p-1 ms-3" title="Silme eposta" @onclick="@(e => RemoveMail(email))" type="button"><span><!--!--><span class="icon "><svg class="svg-inline--fa fa-trash" style="transform: rotate(0deg);" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="trash" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z"></path></svg><!-- <i class="fa-solid fa-trash" style="transform: rotate(0deg);"></i> Font Awesome fontawesome.com --></span></span></button>
-                                            </td>
-                                        </tr>
+                                        @if (editingEmailId == email.Eposta)
+                                        {
+                                            <tr>
+                                                <td class="text-center">
+                                                    <span class="icon p-1"><i class="fas fa-check text-success"></i></span>
+                                                </td>
+                                                <td width="85px">
+                                                    <input @bind="editingEmail.Tanimi" class="form-control" placeholder="Tanım" />
+                                                </td>
+                                                <td>
+                                                    <input @bind="editingEmail.Eposta" class="form-control" type="email" placeholder="E-posta" />
+                                                </td>
+                                                <td class="text-nowrap">
+                                                    <button class="btn link-primary p-0 p-1" @onclick="SaveEditEmail"><i class="fas fa-check"></i></button>
+                                                    <button class="btn link-danger p-0 p-1 ms-2" @onclick="CancelEditEmail"><i class="fas fa-xmark"></i></button>
+                                                </td>
+                                            </tr>
+                                        }
+                                        else
+                                        {
+                                            <tr>
+                                                <td class="text-center">
+                                                    <span class="icon p-1"><i class="fas fa-check text-success"></i></span>
+                                                </td>
+                                                <td class="text-center">@email.Tanimi</td>
+                                                <td>@email.Eposta</td>
+                                                <td class="text-nowrap" width="1%">
+                                                    <button class="btn link-primary p-0 p-1" title="Düztenleme telefon" type="button" @onclick="() => StartEditEmail(email)"><i class="fas fa-pencil"></i></button>
+                                                    <button class="btn link-danger p-0 p-1 ms-3" title="Silme telefon" type="button" @onclick="@(e => RemoveMail(email))"><i class="fas fa-trash"></i></button>
+                                                </td>
+                                            </tr>
+                                        }
                                     }
-                                    if(isAddingMail)
+
+                                    @if (isAddingMail)
                                     {
                                         <tr>
-                                            <td class="text-center"><!--!--><span class="icon p-1"><svg class="svg-inline--fa fa-check text-success" style="transform: rotate(0deg);" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="check" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M438.6 105.4c12.5 12.5 12.5 32.8 0 45.3l-256 256c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L160 338.7 393.4 105.4c12.5-12.5 32.8-12.5 45.3 0z"></path></svg><!-- <i class="fa-solid fa-check text-success" style="transform: rotate(0deg);"></i> Font Awesome fontawesome.com --></span></td>
-                                            <!-- Tanım inputu -->
-                                            <td width="85px" style="position: relative;">
-                                                <input placeholder="Ev, İş.." @bind="tanimi" maxlength="50" style="min-width: 100px;" class="form-control valid" _bl_26="">
+                                            <td class="text-center">
+                                                <span class="icon p-1"><i class="fas fa-check text-success"></i></span>
                                             </td>
-                                            <!-- Eposta inputu -->
-                                            <td style="position: relative;">
-                                                <input class="form-control @(!isEmailValid ? "is-invalid" : "")" type="email" @bind="eposta" placeholder="EPosta" maxlength="250">
+                                            <td width="85px">
+                                                <input placeholder="Ev, İş.." @bind="tanimi" class="form-control" />
                                             </td>
-                                            <!-- Kaydet ve İptal Butonları -->
+                                            <td>
+                                                <input class="form-control @(!isEmailValid ? "is-invalid" : "")"
+                                                       type="email" @bind="eposta" placeholder="E-posta" />
+                                            </td>
                                             <td class="text-nowrap tel-btns" width="1%">
-                                                <!--!--><button class="btn link-primary p-0 p-1" title="kaydet" @onclick="ConfirmAddMail" type="button"><span><!--!--><span class="icon "><svg class="svg-inline--fa fa-check" style="transform: rotate(0deg);" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="check" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M438.6 105.4c12.5 12.5 12.5 32.8 0 45.3l-256 256c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L160 338.7 393.4 105.4c12.5-12.5 32.8-12.5 45.3 0z"></path></svg><!-- <i class="fa-solid fa-check" style="transform: rotate(0deg);"></i> Font Awesome fontawesome.com --></span></span></button><!--!-->
-                                                <!--!--><button class="btn link-danger p-0 p-1 ms-2" title="İptal et" @onclick="CancelAddMail" type="button"><span><!--!--><span class="icon "><svg class="svg-inline--fa fa-xmark" style="transform: rotate(0deg);" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="xmark" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" data-fa-i2svg=""><path fill="currentColor" d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"></path></svg><!-- <i class="fa-solid fa-xmark" style="transform: rotate(0deg);"></i> Font Awesome fontawesome.com --></span></span></button>
+                                                <button class="btn link-primary p-0 p-1" @onclick="ConfirmAddMail"><i class="fas fa-check"></i></button>
+                                                <button class="btn link-danger p-0 p-1 ms-2" @onclick="CancelAddMail"><i class="fas fa-xmark"></i></button>
                                             </td>
                                         </tr>
                                     }
@@ -318,13 +390,14 @@
     {
         var modalRef = Modal.Show<YeniAdresEklePopUpComponent>(title: "Adres Ekleme", new ModalOptions { Position = ModalPosition.Middle, Size = ModalSize.Custom, SizeCustomClass = "my-size" });
 
-        var result = await modalRef.Result;
+        var result = await modalRef.Result;              
         if (!result.Cancelled)
         {
             var newAddress = result.Data as Address;
             if (newAddress != null)
             {
                 GetAdres.Add(newAddress);
+                newCari.AdresId = newAddress.Id;
                 StateHasChanged();
             }
         }
@@ -474,7 +547,7 @@
                     Dahili = dahiliNumber,
                     Tanimi = newPhoneDescription
                 });
-
+            newCari.Telefon = newPhoneNumber;
             ResetPhoneForm();
         }
         else
@@ -539,6 +612,7 @@
             return;
 
         Emails.Add(new Email { Tanimi = tanimi, Eposta = eposta });
+        newCari.Eposta = eposta;
         ResetMailForm();
         StateHasChanged();
     }
@@ -554,4 +628,84 @@
         Emails.Remove(email);
         StateHasChanged();
     }
+
+    private string editingPhoneId;
+    private Phone editingPhone = new Phone();
+    private string editingEmailId;
+    private Email editingEmail = new Email();
+
+    private void StartEditPhone(Phone phone)
+    {
+        editingPhoneId = phone.Number;
+        editingPhone = new Phone
+        {
+            Type = phone.Type,
+            Code = phone.Code,
+            Number = phone.Number,
+            Dahili = phone.Dahili,
+            Tanimi = phone.Tanimi
+        };
+    }
+
+    private void SaveEditPhone()
+    {
+        var phone = Phones.FirstOrDefault(p => p.Number == editingPhoneId);
+        if (phone != null)
+        {
+            phone.Type = editingPhone.Type;
+            phone.Code = editingPhone.Code;
+            phone.Number = editingPhone.Number;
+            phone.Dahili = editingPhone.Dahili;
+            phone.Tanimi = editingPhone.Tanimi;
+        }
+        newCari.Telefon = editingPhone.Number;
+        editingPhoneId = null;
+    }
+
+    private void CancelEditPhone()
+    {
+        editingPhoneId = null;
+        editingPhone = new Phone();
+    }
+    private void StartEditEmail(Email email)
+    {
+        editingEmailId = email.Eposta;
+        editingEmail = new Email
+        {
+            Tanimi = email.Tanimi,
+            Eposta = email.Eposta
+        };
+    }
+    private void SaveEditEmail()
+    {
+        var email = Emails.FirstOrDefault(e => e.Eposta == editingEmailId);
+        if (email != null)
+        {
+            email.Tanimi = editingEmail.Tanimi;
+            email.Eposta = editingEmail.Eposta;
+        }
+        newCari.Eposta = editingEmail.Eposta;
+        editingEmailId = null;
+    }
+
+    private void CancelEditEmail()
+    {
+        editingEmailId = null;
+        editingEmail = new Email();
+    }
+
+    private List<CariModel> cariModels = new List<CariModel>();
+    private CariModel newCari = new CariModel{};
+
+    private async Task SaveCari()
+    {
+        // Form verilerini cariModel'e aktar
+        cariModels.Add(newCari);
+
+        // Modal'ı kapat
+        await BlazoredModal.CloseAsync(ModalResult.Ok(newCari));
+    }
+
 }
+
+

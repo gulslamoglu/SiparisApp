@@ -323,6 +323,7 @@
 
     private async Task HandleValidSubmit()
     {
+        newAddress.Id = 2;
         addresses.Add(newAddress);
         await BlazoredModal.CloseAsync(ModalResult.Ok(newAddress));
         
